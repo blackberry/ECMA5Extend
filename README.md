@@ -32,12 +32,69 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 What if your child type wants to inherit a non-public method? That's called protected.
 
-# Publish-Subscribe event system
+
+# Structure
+
+``` javascript
+
+In this example, we define a parent Type, and a child Type that inherits from the parent. the child will inherit the public and protected spaces.
+
+//parent class
+define("parent", function() {
+
+	var parentType = {
+
+		public : { },
+
+		private : { },
+		
+		protected : { },
+		
+		init : function(){ },
+		
+		destroy : function(){ }
+
+	};
+
+	return {
+		extend : null, // what does this type extend?
+		object : parentType
+	};
+
+});
+
+//child class
+define(["extend!parent"], function(parent) {
+
+	var childType = {
+
+		public : { },
+
+		private : { },
+		
+		protected : { },
+		
+		init : function(){ },
+		
+		destroy : function(){ }
+
+	};
+
+	return {
+		extend : parent
+		object : childType
+	};
+
+});
+
+```
+
+# Intelligent Event/Notification System
 
 ExtendJS has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
 
-- Setting the property to a value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private get notified of the change.
-- You can go behind the property's back if you don't want to alarm the subscribers.
+- Setting the public property to a specific value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private get notified of the change.
+- Setting the private property to a specific value allows you to go behind the property's back if you don't want to alarm the subscribers.
 
 Example:
 
