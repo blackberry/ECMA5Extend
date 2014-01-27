@@ -158,7 +158,7 @@ newType.value = "hi!";
 
 ## Accessing private, public, protected
 
-Access is simple. From anywhere within your type (eg. the init function):
+Access is simple. From anywhere within your type (eg. the init function), use:
 
 ``` javascript
 init : function(){
