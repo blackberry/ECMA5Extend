@@ -126,6 +126,8 @@ Example:
 ...
 ```
 
+Let's play:
+
 ``` javascript
 var newType = someType.create();
 newType.value = "hi!";
