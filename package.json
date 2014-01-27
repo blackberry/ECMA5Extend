@@ -1,12 +1,14 @@
 {
   "name": "extendJS",
-  "description": "project-description",
+  "description": "extendJS",
   "version": "0.0.1",
   "author": {
     "name": "Isaac Gordezky",
     "name": "Anzor Bashkhaz"
   },
   "devDependencies": {
-    "shelljs" : ""
+    "shelljs" : "",
+    "requirejs" : "",
+    "almond" : ""
   }
 }

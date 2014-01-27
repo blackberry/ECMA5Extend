@@ -15,7 +15,9 @@ A mature programming language provides:
 - event system
 
 Some of these are coming in ECMA6, and it will take years for browsers to implement it, plus the syntax changes.
-This is why, after many painful months, we've developed ExtendJS.
+This is why, after many painful projects, we've developed ExtendJS. 
+
+Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not encourage the use of the "new" keyword. 
 
 # Why inheritance
 
@@ -178,24 +180,22 @@ init : function(){
 
 ##How to build##
 
-Currently, the only thing you need to build is the sample. Once the library is available outside of RequireJS, there will be build scripts for ExtendJS as well. For now, refer to sample\Readme.md for build instructions.
+1. Install dependencies:
+```
+> npm install
+```
+2. Build sample
 
-* node.js (http://nodejs.org)
-* npm (node package manager) (http://nodejs.org)
+```
+> cd sample
+> node make
+
+```
 
 **Author** 
 
 * Isaac Gordezky (https://github.com/igordezky)
 * Anzor Bashkhaz (https://github.com/anzorb)
-
-**Dependencies**
-
-*Libraries*
-
-1. [r.js] (https://github.com/jrburke/rjs) is [dual licensed] (https://github.com/jrburke/r.js/blob/master/LICENSE) under the MIT and new BSD licenses.
-2. [almond.js] (https://github.com/jrburke/almond) is [dual licensed] (https://github.com/jrburke/almond/blob/master/LICENSE) under the MIT and new BSD licenses.
-
-Note: the distributable has no dependencies.
 
 ## Disclaimer
 
