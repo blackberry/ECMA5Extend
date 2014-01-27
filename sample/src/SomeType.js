@@ -12,6 +12,11 @@ define(function() {
 			
 			valueChanged : function(newValue){
 				console.log("value changed to " + newValue);
+			},
+			
+			updateValueQuietly : function(value){
+				console.log("shhh.. I just went behind the property's back, without triggering valueChanged!!");
+				this.value = value;
 			}
 			
 		},
@@ -22,7 +27,11 @@ define(function() {
 		},
 		
 		init : function(){
-			console.log("someType init");			
+			console.log("someType init");
+			var _self = this;
+			setTimeout(function updateValueQuietly(){
+				_self.updateValueQuietly("hmmmm");
+			},2000);
 		},
 		
 		destroy : function(){
