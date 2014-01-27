@@ -6,7 +6,7 @@ Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a <a href=
 
 JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing Apps.
 
-** As JavaScript evolves, so should the developers that use it. 
+**As JavaScript evolves, so should the developers that use it.**
 
 A mature programming language provides:
 
