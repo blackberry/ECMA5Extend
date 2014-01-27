@@ -1,8 +1,8 @@
-## ExtendJS
+# ExtendJS
 
 Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
 
-## Why? ##
+## Why?
 
 JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing Apps.
 
@@ -23,7 +23,7 @@ Unlike other "extend-like" projects, this one relies on Object creation and mani
 
 Simple: Code Reuse.
 
-# Why private???
+# Why private?
 
 If you haven't found the need to have private methods and properties in code, then you probably haven't been desiging APIs for long enough. Keep at it. It doesn't happen overnight.
 
@@ -178,12 +178,14 @@ init : function(){
 }
 ```
 
-##How to build##
+##How to build
 
 1. Install dependencies:
+
 ```
 > npm install
 ```
+
 2. Build sample
 
 ```
