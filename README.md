@@ -19,23 +19,23 @@ This is why, after many painful projects, we've developed ExtendJS.
 
 Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not encourage the use of the "new" keyword. 
 
-# Why inheritance
+### Why inheritance?
 
 Simple: Code Reuse.
 
-# Why private?
+### Why private?
 
 If you haven't found the need to have private methods and properties in code, then you probably haven't been desiging APIs for long enough. Keep at it. It doesn't happen overnight.
 
 A good API exposes only a subset of guts to the outside. The rest reside "under the hood", away from the developer. 
 Think of a thermostat, you don't have control over heat or cold directly. You set the temperature, and the thermostat decides which one to turn on, and for how long, based on the room temperature. Setting the temperature is your public API, while access to heat and cold directly are inside of the private API.
 
-# Why protected?
+### Why protected?
 
 What if your child type wants to inherit a non-public method? That's called protected.
 
 
-# Structure
+### Structure
 
 ``` javascript
 
@@ -91,7 +91,7 @@ define(["extend!parent"], function(parent) {
 
 ```
 
-# Intelligent Event/Notification System
+## Intelligent Event/Notification System
 
 ExtendJS has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
 
@@ -156,7 +156,7 @@ newType.value = "hi!";
 
 ```
 
-# Accessing private, public, protected
+## Accessing private, public, protected
 
 Access is simple. From anywhere within your type (eg. the init function):
 
@@ -178,7 +178,7 @@ init : function(){
 }
 ```
 
-##How to build
+## How to build
 
 1. Install dependencies:
 
