@@ -1,6 +1,6 @@
 ## ExtendJS
 
-Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a <a href="http://requirejs.org">RequireJS</a> plugin only, but a distributable library is in the works.
+Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
 
 ## Why? ##
 
@@ -19,13 +19,13 @@ This is why, after many painful months, we've developed ExtendJS.
 
 # Why inheritance
 
-Simple: Code Reuse. Period.
+Simple: Code Reuse.
 
 # Why private???
 
-If you haven't found the need to have private methods and properties in code, then you probably haven't gotten to a point where you want to design good APIs. Keep at it. It doesn't happen overnight.
+If you haven't found the need to have private methods and properties in code, then you probably haven't been desiging APIs for long enough. Keep at it. It doesn't happen overnight.
 
-A clean API exposes only a subset of guts to the outside. The rest reside "under the hood", away from the developer. 
+A good API exposes only a subset of guts to the outside. The rest reside "under the hood", away from the developer. 
 Think of a thermostat, you don't have control over heat or cold directly. You set the temperature, and the thermostat decides which one to turn on, and for how long, based on the room temperature. Setting the temperature is your public API, while access to heat and cold directly are inside of the private API.
 
 # Why protected?
@@ -176,7 +176,7 @@ init : function(){
 
 ##How to build##
 
-Currently, the only thing you need to build is the sample. Once the library is available outside of RequireJS, there will be build scripts. For now, refer to sample\Readme.md for build instructions.
+Currently, the only thing you need to build is the sample. Once the library is available outside of RequireJS, there will be build scripts for ExtendJS as well. For now, refer to sample\Readme.md for build instructions.
 
 * node.js (http://nodejs.org)
 * npm (node package manager) (http://nodejs.org)
