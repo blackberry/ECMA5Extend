@@ -29,6 +29,8 @@ define(function() {
 		init : function(){
 			console.log("someType init");
 			var _self = this;
+			
+			// Let's go behind the subscribers' backs and change the value of 'value'
 			setTimeout(function updateValueQuietly(){
 				_self.updateValueQuietly("hmmmm");
 			},2000);

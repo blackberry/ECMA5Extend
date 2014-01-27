@@ -2,7 +2,7 @@ define(["extend!SomeType"], function(someType) {
 
     var init = function() {    
     	 
-    	window.newType = someType.create();    	 
+    	window.newType = someType.create();  	 
         newType.value = "hi!";
     };
     

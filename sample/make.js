@@ -7,7 +7,7 @@ var build = function(mode) {
 	var dst = path.join(__dirname, "app" + (mode != "release" ? ".js" : ".min.js"));
 	cd(buildDir);
 	
-	var res = exec("node r.js -o build.js out=" + dst + " optimize=uglify");
+	var res = exec("node r.js -o build.js out=" + dst + (mode == "release"? "optimize=uglify" : ""));
 
 	if (res.code != 0) {
 		exit(1);
