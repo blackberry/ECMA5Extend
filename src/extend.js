@@ -119,7 +119,7 @@ define(function() {
 					_this[eventName](nValue, oldValue);
 
 				if (_this.public.subscribers[eventName]) {
-					var listeners = _this.subscribers[eventName];
+					var listeners = _this.public.subscribers[eventName];
 					for (var i = 0; i < listeners.length; i++) {
 						var listener = listeners[i];
 						if ( typeof listener.fn === "function")
