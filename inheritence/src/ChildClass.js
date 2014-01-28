@@ -36,7 +36,7 @@ define("ChildClass", ["extend!ParentClass"], function(ParentClass) {
 		protected : {
 			
 			valueChanged : function valueChanged(newValue){
-				__super__(newValue);
+				//__super__(newValue);
 				console.log("ChildClass: value changed to " + newValue);
 			},
 						

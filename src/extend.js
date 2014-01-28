@@ -1,23 +1,16 @@
-/* Copyright 2013 Research In Motion
- * @author: Anzor Bashkhaz
- * @author: Isaac Gordezky
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 define(function() {
+	var AbstractObject = undefined;
 
 	var createType = function(typeDefinition, name) {
+		if (!typeDefinition.extend) {
+			if (AbstractObject === undefined) {
+				AbstractObject = null;
+				AbstractObject = createType({
+					object : abstractObject
+				}, "AbstractObject");
+			}
+			typeDefinition.extend = AbstractObject;
+		}
 
 		var newType = buildType(typeDefinition, name);
 		buildPrototype(typeDefinition, newType);
@@ -121,12 +114,11 @@ define(function() {
 				var eventName = propertyName + "Changed";
 				if (_this.public[eventName])
 					_this.public[eventName](nValue, oldValue);
-					
 				//internal notification
 				if (_this[eventName])
 					_this[eventName](nValue, oldValue);
 
-				if (_this.subscribers[eventName]) {
+				if (_this.public.subscribers[eventName]) {
 					var listeners = _this.subscribers[eventName];
 					for (var i = 0; i < listeners.length; i++) {
 						var listener = listeners[i];
@@ -163,10 +155,7 @@ define(function() {
 		return type;
 	};
 
-	var rootType = false;
-
 	var buildPrototype = function(definition, newType) {
-
 		var prototype = definition.extend ? Object.create(definition.extend.prototype) : {};
 		Object.defineProperty(prototype, "constructor", {
 			value : newType
@@ -176,88 +165,6 @@ define(function() {
 			enumerable : true,
 			value : prototype
 		});
-		if (!definition.extend) {
-			console.log("building root type");
-			rootType = true;
-		}
-	};
-
-	var appendPublishSubscribe = function appendPublishSubscribe(instancePrivate) {
-		//append private methods
-		instancePrivate.subscribers = {};
-		Object.defineProperty(instancePrivate, "subscribe", {
-			value : function(eventName, listener, id) {
-				if (!instancePrivate.subscribers[eventName])
-					instancePrivate.subscribers[eventName] = [];
-				instancePrivate.subscribers[eventName].push({
-					id : id ? id : null,
-					fn : listener
-				});
-			}
-		});
-		Object.defineProperty(instancePrivate, "unsubscribe", {
-			value : function(eventName, listener, id) {
-				var eventGroup = this.subscribers[eventName];
-				if (eventGroup) {
-					for (var i = 0; i < eventGroup.length; i++) {
-						var singleEvent = eventGroup[i];
-						if (id && singleEvent.id && singleEvent.id === id)
-							eventGroup.splice(i, 1);
-						else if (listener && singleEvent.fn && singleEvent.fn === listener){
-							eventGroup.splice(i, 1);
-						}
-					}
-				}
-			}
-		});
-		Object.defineProperty(instancePrivate, "publish", {
-			value : function(eventName, newValue, oldValue, internalOnly) {
-				//console.log(eventName === "onActiveTabChanged");
-				if (instancePrivate[eventName]) {
-					instancePrivate[eventName](newValue, oldValue);
-				}
-
-				if (instancePrivate.protected[eventName]) {
-					instancePrivate.protected[eventName](newValue, oldValue);
-				}
-
-				//external nofitication
-				if (instancePrivate.public[eventName] && !internalOnly) {
-					instancePrivate.public[eventName](newValue, oldValue);
-				}
-				if ( typeof instancePrivate.subscribers === "undefined")
-					return;
-
-				//go through any other listeners and publish message
-				if (instancePrivate.subscribers[eventName]) {
-					var listeners = instancePrivate.subscribers[eventName];
-					for (var i = 0; i < listeners.length; i++) {
-						var listener = listeners[i];
-						if ( typeof listener.fn === "function")
-							listener.fn(newValue, oldValue);
-					}
-
-				}
-			}
-		});
-
-		//append public methods
-		Object.defineProperty(instancePrivate.public, "subscribe", {			
-			value : function(eventName, listener, id) {
-				instancePrivate.subscribe(eventName, listener, id);
-			}
-		});
-		Object.defineProperty(instancePrivate.public, "unsubscribe", {
-			value : function(eventName, listener, id) {
-				instancePrivate.unsubscribe(eventName, listener, id);
-			}
-		});
-		Object.defineProperty(instancePrivate.public, "publish", {
-			value : function(eventName, newValue, oldValue, internalOnly) {
-				instancePrivate.publish(eventName, newValue, oldValue, internalOnly);
-			}
-		});
-
 	};
 
 	var buildConstructor = function(definition, newType) {
@@ -357,10 +264,6 @@ define(function() {
 				}
 			}
 
-			//if the type is a root, we append publish/subscribe functionality, which is inherited by all children
-			if (rootType)
-				appendPublishSubscribe(instancePrivate);
-
 			/* add initi as a pre-chained function */
 			definePreChainedFunction(instanceProtected, "init", objectInit, instancePrivate);
 			definePostChainedFunction(instanceProtected, "destroy", objectDestroy, instancePrivate);
@@ -384,6 +287,113 @@ define(function() {
 			value : create
 		});
 
+	};
+
+	var abstractObject = {
+
+		private : {
+
+			subscribe : function(eventName, listener, id) {
+				if (!this.subscribers[eventName])
+					this.subscribers[eventName] = [];
+				this.subscribers[eventName].push({
+					id : id ? id : null,
+					fn : listener
+				});
+			},
+
+			unsubscribe : function(eventName, listener, id) {
+				var eventGroup = this.subscribers[eventName];
+				if (eventGroup) {
+					for (var i = 0; i < eventGroup.length; i++) {
+						var singleEvent = eventGroup[i];
+						if (id && singleEvent.id && singleEvent.id === id)
+							eventGroup.splice(i, 1);
+						else if (listener && singleEvent.fn && singleEvent.fn === listener) {
+							eventGroup.splice(i, 1);
+						}
+					}
+				}
+			},
+
+			//run a method by name and pass data aka notify
+			publish : function(eventName, newValue, oldValue, internalOnly) {
+				//console.log(eventName === "onActiveTabChanged");
+				if (this[eventName]) {
+					this[eventName](newValue, oldValue);
+				}
+
+				if (this.protected[eventName]) {
+					this.protected[eventName](newValue, oldValue);
+				}
+
+				//external nofitication
+				if (this.public[eventName] && !internalOnly) {
+					this.public[eventName](newValue, oldValue);
+				}
+				if (!this.subscribers)
+					return;
+				//go through any other listeners and publish message
+				if (this.subscribers[eventName]) {
+					var listeners = this.subscribers[eventName];
+					for (var i = 0; i < listeners.length; i++) {
+						var listener = listeners[i];
+						if ( typeof listener.fn === "function")
+							listener.fn(newValue, oldValue);
+					}
+				}
+			}
+		},
+
+		public : {
+
+			subscribe : function(eventName, listener, id) {
+				this.subscribe(eventName, listener, id);
+			},
+
+			unsubscribe : function(eventName, listener, id) {
+				this.unsubscribe(eventName, listener, id);
+			},
+
+			//run a method by name and pass data aka notify
+			publish : function(eventName, newValue, oldValue, internalOnly) {
+				this.publish(eventName, newValue, oldValue, internalOnly);
+			}
+		},
+
+		init : function() {
+			this.subscribers = {};
+			this.public.subscribers = this.subscribers;
+		},
+
+		destroy : function() {
+			var destroyProperties = function(object) {
+				var publicProps = Object.getOwnPropertyNames(object);
+				for (var propertyName in publicProps) {
+					var property = publicProps[propertyName];
+					var value = object[property];
+					if (value) {
+						if (value.destroy && property !== "parent")
+							value.destroy();
+					}
+					Object.defineProperty(object, property, {
+						value : null
+					});
+				}
+			};
+
+			destroyProperties(this.public);
+			Object.defineProperty(this, "public", {
+				value : null
+			});
+
+			destroyProperties(this.protected);
+			Object.defineProperty(this, "protected", {
+				value : null
+			});
+
+			destroyProperties(this);
+		}
 	};
 
 	var extend = {
@@ -411,4 +421,4 @@ define(function() {
 	};
 
 	return extend;
-});
+}); 
