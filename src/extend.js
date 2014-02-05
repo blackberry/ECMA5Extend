@@ -252,9 +252,9 @@ define(function() {
 							get : function() {
 								return value.get.apply(instancePrivate);
 							},
-							set : function() {
+							set : value.set ? function() {
 								return value.set.apply(instancePrivate, arguments);
-							},
+							} : undefined,
 						});
 					})(instancePrivate, propertyName, value);
 				} else if (notFunction) {
