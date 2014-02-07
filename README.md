@@ -195,12 +195,24 @@ One of the amazing parts of ECMA5Extend is that developers are able to define pr
 					return this.value;				
 				},
 				set: function(newValue){
+					//this provides granular control over what the values are set to
 					if (newValue < 0 || newValue > 100){
 						throw new Error("out of bounds exception for value");
-					else
+					}
+					else{
+						//set value
 						this.value = newValue;
-					
+						//publish change event on type
+						this.public.publish("valueChanged", newValue);
+					}					
 				}
+			},
+			
+			someReadOnlyProperty: {
+				//omit the "set" function for the property to be read-only
+				get: function(){
+					return this.someReadOnlyProperty;
+				}			
 			}
 			
 		}
