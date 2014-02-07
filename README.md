@@ -178,6 +178,36 @@ init : function(){
 }
 ```
 
+## Using ECMA5 descriptors to define properties
+
+One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only properties, but also provide limits on changes among other features.
+
+
+``` javascript
+
+	var someType = {
+
+		public : {
+			
+			value : {
+				enumerable: true,
+				get: function(){
+					return this.value;				
+				},
+				set: function(newValue){
+					if (newValue < 0 || newValue > 100){
+						throw new Error("out of bounds exception for value");
+					else
+						this.value = newValue;
+					
+				}
+			}
+			
+		}
+
+...
+```
+
 ## How to build
 
 1. Install dependencies:
