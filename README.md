@@ -1,6 +1,6 @@
 # ECMA5Extend
 
-Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
+Small toolkit for writing clean JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
 
 ## Why?
 
