@@ -1,4 +1,4 @@
-# ExtendJS
+# ECMA5Extend
 
 Small toolkit for writing 'big-boy' JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
 
@@ -93,7 +93,7 @@ define(["extend!parent"], function(parent) {
 
 ## Intelligent Event/Notification System
 
-ExtendJS has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
+ECMA5Extend has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
 
 - Setting the public property to a specific value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private get notified of the change.
 - Setting the private property to a specific value allows you to go behind the property's back if you don't want to alarm the subscribers.
