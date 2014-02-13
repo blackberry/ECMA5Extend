@@ -52,7 +52,7 @@ define(function() {
 			},
 			
 			// public function that interfaces with a private function
-			updateValueQuietly : function(newValue) {
+			updateValueQuietly : function updateValueQuietly(newValue) {
 				//run the private updateValueQuietly function
 				this.updateValueQuietly(newValue);
 			}
@@ -60,11 +60,11 @@ define(function() {
 
 		private : {
 
-			valueChanged : function(newValue) {
+			valueChanged : function valueChanged(newValue) {
 				console.log("value changed to " + newValue);
 			},
 
-			updateValueQuietly : function(value) {
+			updateValueQuietly : function updateValueQuietly(value) {
 				console.log("shhh.. I just went behind the property's back, without triggering valueChanged!!");
 				this.value = value;
 			}
@@ -74,7 +74,7 @@ define(function() {
 
 		},
 
-		init : function() {
+		init : function init() {
 			console.log("someType init");
 			// set the public API property, which triggers a valueChanged event
 			this.public.value = "something";
@@ -82,7 +82,7 @@ define(function() {
 			this.value = "something";
 		},
 
-		destroy : function() {
+		destroy : function destroy() {
 
 		}
 	};
