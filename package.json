@@ -5,10 +5,5 @@
   "author": {
     "name": "Isaac Gordezky",
     "name": "Anzor Bashkhaz"
-  },
-  "devDependencies": {
-    "shelljs" : "",
-    "requirejs" : "",
-    "almond" : ""
   }
 }

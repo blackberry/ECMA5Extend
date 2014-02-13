@@ -220,21 +220,26 @@ One of the amazing parts of ECMA5Extend is that developers are able to define pr
 ...
 ```
 
-## How to build
+##How to build##
 
-1. Install dependencies:
+To build aurora.js, you will need the following:
 
-```
-> npm install
-```
+* node.js (http://nodejs.org)
+* npm (node package manager) (http://nodejs.org)
+* grunt (http://gruntjs.com)
 
-2. Build sample
-
-```
-> cd sample
-> node make
-
-```
+1. First, install grunt globally:
+	```
+	npm install -g grunt-cli
+	```
+2. Install dependencies, run:
+	```
+	npm install
+	```
+3. Run grunt:
+	```
+	grunt
+	```
 
 **Author** 
 

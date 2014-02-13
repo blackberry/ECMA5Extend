@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-define(function() {
+define("ParentClass", function() {
 
 	var someType = {
 
@@ -27,44 +27,33 @@ define(function() {
 
 		private : {
 			
-			valueChanged : function(newValue){
-				console.log("value changed to " + newValue);
-			},
-			
-			updateValueQuietly : function(value){
-				console.log("shhh.. I just went behind the property's back, without triggering valueChanged!!");
-				this.value = value;
+			valueChanged : function valueChanged(newValue){
+				this.protected.valueChanged(newValue);
 			}
 			
 		},
 		
 		protected : {
 			
+			valueChanged : function valueChanged(newValue){
+				console.log("ParentClass: value changed to " + newValue);
+			},
 						
 		},
 		
-		init : function(){
-			console.log("someType init");
-			var _self = this;
+		init : function init(){
+			console.log("ParentClass init");
 			
-			this.public.value = "something";
-			this.value = "something";
-			
-			// Let's go behind the subscribers' backs and change the value of 'value'
-			setTimeout(function updateValueQuietly(){
-				_self.updateValueQuietly("hmmmm");
-			},2000);
 		},
 		
-		destroy : function(){
+		destroy : function destroy(){
 			
 		}
 
 	};
 
 	return {
-		extend : null, //parent type
-		object : someType
+		definition : someType
 	};
 
 });

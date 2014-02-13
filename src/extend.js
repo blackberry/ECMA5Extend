@@ -6,7 +6,7 @@ define(function() {
 			if (AbstractObject === undefined) {
 				AbstractObject = null;
 				AbstractObject = createType({
-					object : abstractObject
+					definition : abstractObject
 				}, "AbstractObject");
 			}
 			typeDefinition.extend = AbstractObject;
@@ -168,12 +168,12 @@ define(function() {
 	};
 
 	var buildConstructor = function(definition, newType) {
-		var public = definition.object.public;
-		var protected = definition.object.protected;
-		var private = definition.object.private;
-		var objectInit = definition.object.init ? definition.object.init : function() {
+		var public = definition.definition.public;
+		var protected = definition.definition.protected;
+		var private = definition.definition.private;
+		var objectInit = definition.definition.init ? definition.definition.init : function() {
 		};
-		var objectDestroy = definition.object.destroy ? definition.object.destroy : function() {
+		var objectDestroy = definition.definition.destroy ? definition.definition.destroy : function() {
 		};
 		var _this = this;
 

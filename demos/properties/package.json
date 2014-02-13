@@ -5,5 +5,8 @@
   "author": {
     "name": "Isaac Gordezky",
     "name": "Anzor Bashkhaz"
+  },
+    "devDependencies": {
+    	"requirejs" : ""
   }
 }

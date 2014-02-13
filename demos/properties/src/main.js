@@ -14,49 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+require.config({
+	baseUrl : "src",
+	paths : {
+		"extend" : "../../../src/extend",
+	}
+});
 
-define("ChildClass", ["extend!ParentClass"], function(ParentClass) {
+require(["extend!SomeType"], function(someType) {
 
-	var someType = {
+	var newType = someType.create();
+	newType.value = "hi!";
+	// value changed to hi! 
+	
+	newType.readOnlyValue = "Let's see if this works!";
+	//no effect on value
 
-		public : {
-			
-			childValue : null
-			
-		},
+	// Let's go behind the subscribers' backs and change the value of 'value'
+	newType.updateValueQuietly("hmmmm");
 
-		private : {
-			
-			childValueChanged : function(newValue){
-				console.log("ChildClass: childValue changed to " + newValue);
-			}
-						
-		},
-		
-		protected : {
-			
-			valueChanged : function valueChanged(newValue){
-				//__super__(newValue);
-				console.log("ChildClass: value changed to " + newValue);
-			},
-						
-		},
-		
-		init : function(){
-			console.log("ChildClass init");
-			var _self = this;
-			
-		},
-		
-		destroy : function(){
-			
-		}
-
-	};
-
-	return {
-		extend : ParentClass,
-		object : someType
-	};
+	newType.limitedValue = 101;
+	//Error: Out of bounds
 
 });

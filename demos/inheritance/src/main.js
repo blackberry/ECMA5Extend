@@ -1,5 +1,4 @@
-<!--
- Copyright 2013 Research In Motion
+/* Copyright 2013 Research In Motion
  * @author: Anzor Bashkhaz
  * @author: Isaac Gordezky
  *
@@ -14,12 +13,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
--->
-<html>
-  <head>
-  	<title>ExtendJS sample</title>  	
-  </head>
-  <body>
-  	<script type="text/javascript" src="app.js"></script>
-  </body>	
-</html>
+ */
+
+require.config({
+	baseUrl: "src",
+	paths : {
+		"extend" : "../../../src/extend",
+	}
+});
+
+require(["extend!ParentClass", "extend!ChildClass"], function(ParentClass, ChildClass) {
+
+	
+    window.parentObject = ParentClass.create();
+    parentObject.value = "hi!";
+    
+    window.childObject = ChildClass.create();
+    // chilObject inherits parent's public properties and methods
+    childObject.value = "ho!";
+    
+});
