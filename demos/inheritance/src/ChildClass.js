@@ -21,7 +21,7 @@ define("ChildClass", ["extend!ParentClass"], function(ParentClass) {
 
 		public : {
 			
-			childValue : null
+			childValue : null					
 			
 		},
 
@@ -30,7 +30,7 @@ define("ChildClass", ["extend!ParentClass"], function(ParentClass) {
 			childValueChanged : function childValueChanged(newValue){
 				console.log("ChildClass: childValue changed to " + newValue);
 			}
-						
+					
 		},
 		
 		protected : {

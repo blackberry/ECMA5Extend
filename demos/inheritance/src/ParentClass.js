@@ -21,29 +21,41 @@ define("ParentClass", function() {
 
 		public : {
 			
-			value : null
+			value : null,
+			
+			anotherValue : null
 			
 		},
 
 		private : {
 			
 			valueChanged : function valueChanged(newValue){
+				// call the protected method
 				this.protected.valueChanged(newValue);
+			},
+			
+			anotherValueChanged : function valueChanged(newValue){
+				// call the protected method
+				this.protected.anotherValueChanged(newValue);
 			}
 			
 		},
 		
 		protected : {
 			
-			valueChanged : function valueChanged(newValue){
-				console.log("ParentClass: value changed to " + newValue);
+			valueChanged : function valueChanged(newValue){		
+				console.log("[protected] ParentClass: value changed to " + newValue);
+			},
+			
+			anotherValueChanged : function valueChanged(newValue){		
+				//example of protected that is not implemented by the child type
+				console.log("[protected implemented in ParentClass]: value changed to " + newValue);				
 			},
 						
 		},
 		
 		init : function init(){
-			console.log("ParentClass init");
-			
+			console.log("ParentClass init");			
 		},
 		
 		destroy : function destroy(){

@@ -218,7 +218,17 @@ One of the amazing parts of ECMA5Extend is that developers are able to define pr
 ...
 ```
 
-##How to build##
+## Re-implementing parent methods using protected
+
+The main differentiator in ECMA5Extend is definitely the protected space. When desiging complex systems, protected methods allow for code reuse, as they allow children classes to inherit and re-implement their parent's non-public methods.
+
+Take a look at demos/inheritance for a demo.
+
+For example, lets say you are building a UI framework. You'd like buttons to inherit from a control type. The Control type provides a protected method ""
+ 
+
+
+## How to build
 
 To build aurora.js, you will need the following:
 

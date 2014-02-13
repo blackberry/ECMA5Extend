@@ -24,12 +24,16 @@ require.config({
 
 require(["extend!ParentClass", "extend!ChildClass"], function(ParentClass, ChildClass) {
 
-	
-    window.parentObject = ParentClass.create();
-    parentObject.value = "hi!";
+	//extend returns a type with method "create"
+	window.parentObject = ParentClass.create();
+    //parentObject.value = "hi!"; //[protected] ParentClass: value changed to hi! 
     
     window.childObject = ChildClass.create();
-    // chilObject inherits parent's public properties and methods
-    childObject.value = "ho!";
+
+    // we've re-implemented parent's valueChanged protected method 
+    childObject.value = "ho!"; // [protected] ChildClass: value changed to ho! 
     
+    //we've not re-implemented parent class' anotherValue protected method, so this will use the parents' within the child's scope
+    childObject.anotherValue = "hello!"; //[protected implemented in ParentClass]: value changed to hello! 
+        
 });
