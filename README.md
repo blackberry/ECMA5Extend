@@ -58,7 +58,7 @@ define("parent", function() {
 
 	return {
 		extend : null, // what does this type extend?
-		object : parentType
+		definition : parentType
 	};
 
 });
