@@ -11,13 +11,13 @@ JavaScript was originally invented to do basic form validation and arithmetic, a
 A mature programming language provides:
 
 - Inheritance
-- public, private and protected spaces for its API
-- event system
+- Public, private and protected API
+- Intelligent event system
 
 Some of these are coming in ECMA6, and it will take years for browsers to implement it, plus the syntax changes.
 This is why, after many painful projects, we've developed ExtendJS. 
 
-Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not encourage the use of the "new" keyword. 
+Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not use the "new" keyword and instead relies on inheritance using ECMA5 Object.create(). 
 
 ### Why inheritance?
 
@@ -30,7 +30,7 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 ### Why protected?
 
-What if your child type wants to inherit a non-public method? That's called protected.
+What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
 
 ### Structure
@@ -82,7 +82,7 @@ define(["extend!parent"], function(parent) {
 
 	return {
 		extend : parent
-		object : childType
+		definition : childType
 	};
 
 });
@@ -154,28 +154,6 @@ newType.value = "hi!";
 
 ```
 
-## Accessing private, public, protected
-
-Access is simple. From anywhere within your type (eg. the init function), use:
-
-``` javascript
-init : function(){
-	
-	// access to private property
-	this.text = "hi there, I just secretly set the value of text :)";
-	
-	// access to private method
-	this.waveHello();
-	
-	// access to public API (will trigger textChanged event)
-	this.public.text = "hi there!"; 	
-
-	//access to protected, will call the parent type's draw if draw isn't reimplemented by this type
-	this.protected.draw(); 
-
-}
-```
-
 ## Using ECMA5 descriptors to define properties
 
 One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only properties, but also provide limits on changes among other features.
@@ -218,15 +196,65 @@ One of the amazing parts of ECMA5Extend is that developers are able to define pr
 ...
 ```
 
+This also allows you to directly access other variables in the getter and setter, for example, let's design a TextField type, which is essentially an input box:
+
+```
+var definition = {
+   public: {
+      value: {
+         get: function(){
+            return this.public.el.value; //direct access to DOM
+         },
+         set: function(newValue){
+            if (validate(newValue)){ //this allows for smart validation and setting limits
+                this.public.el.value = newValue;
+                // this also requires to publish a change event manually
+                this.public.publish("textChanged", newValue);
+            }
+         }
+      }
+   },
+
+   init : function(){
+      this.public.el = document.createElement("input");
+      this.public.el.setAttribute("type","text");
+      //subscribe to changes to DOM, so that we publish a changedEvent
+      var _self = this;
+      this.public.el.addEventListener("change", function(){
+         //publish the value retrieved using getter defined above, as to not duplicate data
+         _self.public.publish("valueChanged", _self.public.value); 
+      }
+   }
+...
+```
+
+## Accessing private, public, protected
+
+Access is simple. From anywhere within your type (eg. the init function), use:
+
+``` javascript
+init : function(){
+	
+	// access to private property
+	this.text = "hi there, I just secretly set the value of text :)";
+	
+	// access to private method
+	this.waveHello();
+	
+	// access to public API (will trigger textChanged event)
+	this.public.text = "hi there!"; 	
+
+	//access to protected, will call the parent type's draw if draw isn't reimplemented by the child (self) type
+	this.protected.draw(); 
+
+}
+```
+
 ## Re-implementing parent methods using protected
 
-The main differentiator in ECMA5Extend is definitely the protected space. When desiging complex systems, protected methods allow for code reuse, as they allow children classes to inherit and re-implement their parent's non-public methods.
+One of the best features of ECMA5Extend, is the ability to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
 
-Take a look at demos/inheritance for a demo.
-
-For example, lets say you are building a UI framework. You'd like buttons to inherit from a control type. The Control type provides a protected method ""
- 
-
+Take a look at demos/inhertance for an example of this.
 
 ## How to build
 
