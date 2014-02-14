@@ -110,8 +110,7 @@ define(function() {
 	var defineProperty = function(_this, propertyName, propertyValue) {
 		var definition;
 		_this[propertyName] = propertyValue;
-		if (window.__debug)
-			console.log("define property on " + propertyName + " = " + propertyValue);
+
 		Object.defineProperty(_this.public, propertyName, {
 			configurable : true,
 			enumerable : true,
@@ -120,9 +119,7 @@ define(function() {
 			},
 			set : function set(nValue) {
 				var oldValue = _this[propertyName];
-				if (nValue === oldValue) {
-					if (window.__debug)
-						console.log("Setting property to the same value. Ignoring");
+				if (nValue === oldValue){
 					return;
 				}
 				_this[propertyName] = nValue;
@@ -144,8 +141,6 @@ define(function() {
 					}
 				}
 
-				if (window.__debug)
-					console.log("value of " + propertyName + " changed to " + _this[propertyName]);
 			}
 			// }
 		});
@@ -208,8 +203,6 @@ define(function() {
 				});
 			}
 
-			if (window.__debug)
-				console.log("CREATE " + newType.name);
 			Object.defineProperties(instancePrivate, {
 				protected : {
 					configurable : true,
@@ -261,14 +254,14 @@ define(function() {
 			for (var propertyName in public) {
 				var notFunction = ( typeof public[propertyName]) !== "function";
 				var value = public[propertyName];
-				if (notFunction && value && value.get) {
+				if (notFunction && value && (value.get || value.set)) {
 					(function(instancePrivate, propertyName, value) {
 						Object.defineProperty(instancePrivate.public, propertyName, {
-							enumerable : value.enumerable,
-							configurable : true,
-							get : function() {
+							enumerable : true,
+							configurable : true,							
+							get : value.get ? function() {
 								return value.get.apply(instancePrivate);
-							},
+							} : undefined,
 							set : value.set ? function() {
 								return value.set.apply(instancePrivate, arguments);
 							} : undefined,

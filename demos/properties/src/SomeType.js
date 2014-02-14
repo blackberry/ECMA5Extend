@@ -21,20 +21,25 @@ define(function() {
 
 		public : {
 
-			value : null,
+			value : null,			
 
 			// ECMA5 property descriptor way of definging a read only property
-			readOnlyValue : {
-				enumerable : true,
+			readOnlyProperty : {
 				get : function() {
-					return this.readOnlyValue;
+					return this.readOnlyProperty;
 				}
 				//notice there is no setter
+			},
+			
+			// ECMA5 property descriptor way of definging a write only property			
+			writeOnlyProperty : {
+				set : function(value) {
+					this.writeOnlyProperty = value;
+				}		
 			},
 
 			// ECMA5 property descriptor way of providing a custom setter and publishing a change event manually
 			limitedValue : {
-				enumerable : true,
 				get : function() {
 					return this.limitedValue;
 				},
@@ -75,11 +80,7 @@ define(function() {
 		},
 
 		init : function init() {
-			console.log("someType init");
-			// set the public API property, which triggers a valueChanged event
-			this.public.value = "something";
-			// set the private property, which quietly sets the value
-			this.value = "something";
+
 		},
 
 		destroy : function destroy() {

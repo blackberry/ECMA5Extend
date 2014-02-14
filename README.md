@@ -276,6 +276,12 @@ To build aurora.js, you will need the following:
 	```
 	grunt
 	```
+	
+## Tests
+
+```
+jasmine-node --runWithRequireJs .\tests
+```
 
 **Author** 
 
