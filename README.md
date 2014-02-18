@@ -1,9 +1,6 @@
 # ECMA5Extend
 
-Small toolkit for writing good JavaScript APIs. It comes in two flavors:
-
-1. RequireJS AMD Plugin (http://requirejs.org/)
-2. Standalone Library
+Small toolkit for writing good JavaScript APIs.
 
 ## Why?
 
@@ -36,6 +33,11 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
 ## Structure
+
+It comes in two flavors:
+
+1. RequireJS AMD Plugin (http://requirejs.org/)
+2. Standalone Library
 
 ### **Standalone Library**
 
