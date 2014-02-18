@@ -1,6 +1,6 @@
 require.config({
 	paths : {
-		"extend" : "../src/extend",
+		"extend" : "../src/ECMA5Extend",
 		"SomeType" : "../demos/requirejs/properties/src/SomeType"
 	}
 });
@@ -9,13 +9,11 @@ require(['extend!SomeType'], function(type) {
 
 	describe('Basics', function() {
 
-		//Need a better naming system
 		it('should load type', function() {	
 			expect(type.constructor.name).toBe('Type<SomeType>');
 			expect(type.name).toBe('SomeType');
 		});
 		
-		//Need a better naming system
 		it('should be able to create instance', function(){
 			expect(type.create).not.toBe(null);
 			var instance = type.create();

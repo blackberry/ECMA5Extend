@@ -18,7 +18,7 @@
 require.config({
 	baseUrl: "src",
 	paths : {
-		"extend" : "../../../../src/extend",
+		"extend" : "../../../../src/ECMA5Extend",
 	}
 });
 

@@ -1,6 +1,6 @@
 require.config({	
 	paths : {
-		"extend" : "../src/extend",
+		"extend" : "../src/ECMA5Extend",
 		"ChildType" : "../demos/requirejs/inheritance/src/ChildType",
 		"ParentType" : "../demos/requirejs/inheritance/src/ParentType"
 	}
