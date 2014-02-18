@@ -127,7 +127,8 @@ define("parent", function() {
 	};
 
 });
-```
+
+
 //child class
 define(["extend!parent"], function(parent) {
 
