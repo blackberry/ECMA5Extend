@@ -17,7 +17,11 @@
 
 define(function() {
 
-	var someType = {
+	return {
+		
+		extend : null, //root Type
+		
+		name : "SomeType",
 
 		public : {
 
@@ -51,7 +55,7 @@ define(function() {
 						// set the value
 						this.limitedValue = newValue;
 						//publish changed event
-						this.public.publish("limitedValueChanged", newValue);
+						this.public.publish("limitedValueChanged", this.limitedValue);
 					}
 				}
 			},
@@ -86,11 +90,6 @@ define(function() {
 		destroy : function destroy() {
 
 		}
-	};
-
-	return {
-		extend : null, //parent type
-		definition : someType
 	};
 
 });

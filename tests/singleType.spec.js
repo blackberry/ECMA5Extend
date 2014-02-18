@@ -1,18 +1,21 @@
-require(['../src/extend!../demos/properties/src/SomeType'], function(type) {
+require.config({	
+	paths : {
+		"extend" : "../src/extend",
+	}
+});
+
+require(['extend!../demos/properties/src/SomeType'], function(type) {
 
 	describe('Basics', function() {
 
-		beforeEach(function() {
-
-		});
-		
 		//Need a better naming system
-		xit('should load type', function() {		
+		it('should load type', function() {	
+			expect(type.constructor.name).toBe('Type<SomeType>');
 			expect(type.name).toBe('SomeType');
 		});
 		
 		//Need a better naming system
-		xit('should be able to create instance', function(){
+		it('should be able to create instance', function(){
 			expect(type.create).not.toBe(null);
 			var instance = type.create();
 			expect(instance.constructor.name).toBe("SomeType");

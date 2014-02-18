@@ -42,7 +42,11 @@ In this example, we define a parent Type, and a child Type that inherits from th
 //parent class
 define("parent", function() {
 
-	var parentType = {
+	return {
+	
+		name : "parentType",
+		
+		extend : null, //parent Type
 
 		public : { },
 
@@ -54,11 +58,6 @@ define("parent", function() {
 		
 		destroy : function(){ }
 
-	};
-
-	return {
-		extend : null, // what does this type extend?
-		definition : parentType
 	};
 
 });
@@ -66,7 +65,11 @@ define("parent", function() {
 //child class
 define(["extend!parent"], function(parent) {
 
-	var childType = {
+	return {
+	
+		name : "childType"
+		
+		extend : parent,
 
 		public : { },
 
@@ -78,11 +81,6 @@ define(["extend!parent"], function(parent) {
 		
 		destroy : function(){ }
 
-	};
-
-	return {
-		extend : parent
-		definition : childType
 	};
 
 });
@@ -279,8 +277,20 @@ To build aurora.js, you will need the following:
 	
 ## Tests
 
+Install jasmine
+
+```
+npm install -g jasmine-node
+```
+
+Run tests:
 ```
 jasmine-node --runWithRequireJs .\tests
+```
+
+If jasmine returns nothing, add --captureExceptions flag
+```
+jasmine-node --runWithRequireJs --captureExceptions .\tests
 ```
 
 **Author** 

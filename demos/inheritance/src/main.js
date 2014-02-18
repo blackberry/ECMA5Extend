@@ -22,13 +22,13 @@ require.config({
 	}
 });
 
-require(["extend!ParentClass", "extend!ChildClass"], function(ParentClass, ChildClass) {
+require(["extend!ParentType", "extend!ChildType"], function(ParentType, ChildType) {
 
 	//extend returns a type with method "create"
-	window.parentObject = ParentClass.create();
+	window.parentObject = ParentType.create();
     //parentObject.value = "hi!"; //[protected] ParentClass: value changed to hi! 
     
-    window.childObject = ChildClass.create();
+    window.childObject = ChildType.create();
 
     // we've re-implemented parent's valueChanged protected method 
     childObject.value = "ho!"; // [protected] ChildClass: value changed to ho! 

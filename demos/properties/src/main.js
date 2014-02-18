@@ -23,7 +23,7 @@ require.config({
 
 require(["extend!SomeType"], function(someType) {
 
-	var newType = someType.create();
+	window.newType = someType.create();
 	newType.value = "hi!";
 	// value changed to hi! 
 	
