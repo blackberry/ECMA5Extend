@@ -2,8 +2,6 @@
 
 Toolkit for writing GOOD JavaScript APIs for both Browser and NodeJS using ECMA5.
 
-<hr/>
-
 ## Why?
 
 JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing client and server-side Apps.
@@ -34,7 +32,6 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
-<hr/>
 ## Structure and how to use
 
 ECMA5Extend allows developers to clearly define their type definition, that compile into a **type** that have the following public API:
@@ -187,8 +184,6 @@ require(["extend!child"], function(childType) {
 
 });
 ```
-
-<hr/>
 
 ## Intelligent Event/Notification System
 
@@ -362,7 +357,6 @@ One of the best features of ECMA5Extend, is the ability to declare protected met
 
 Take a look at demos/inhertance for an example of this.
 
-<hr/>
 
 ## Tests
 
@@ -389,7 +383,6 @@ jasmine-node --runWithRequireJs --captureExceptions .\tests
 * Anzor Bashkhaz (https://github.com/anzorb)
 * Isaac Gordezky (https://github.com/igordezky)
 
-<hr/>
 
 ## Disclaimer
 
