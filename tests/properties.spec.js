@@ -1,7 +1,7 @@
 require.config({
 	paths : {
 		"extend" : "../src/extend",
-		"SomeType" : "../demos/properties/src/SomeType"
+		"SomeType" : "../demos/requirejs/properties/src/SomeType"
 	}
 });
 

@@ -17,23 +17,23 @@
 require.config({
 	baseUrl : "src",
 	paths : {
-		"extend" : "../../../src/extend",
+		"extend" : "../../../../src/extend",
 	}
 });
 
 require(["extend!SomeType"], function(someType) {
 
-	window.newType = someType.create();
-	newType.value = "hi!";
+	window.someTypeInstance = someType.create();
+	someTypeInstance.value = "hi!";
 	// value changed to hi! 
 	
-	newType.readOnlyValue = "Let's see if this works!";
+	someTypeInstance.readOnlyValue = "Let's see if this works!";
 	//no effect on value
 
 	// Let's go behind the subscribers' backs and change the value of 'value'
-	newType.updateValueQuietly("hmmmm");
+	someTypeInstance.updateValueQuietly("hmmmm");
 
-	newType.limitedValue = 101;
+	someTypeInstance.limitedValue = 101;
 	//Error: Out of bounds
 
 });

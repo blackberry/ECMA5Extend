@@ -1,8 +1,8 @@
 require.config({	
 	paths : {
 		"extend" : "../src/extend",
-		"ChildType" : "../demos/inheritance/src/ChildType",
-		"ParentType" : "../demos/inheritance/src/ParentType"
+		"ChildType" : "../demos/requirejs/inheritance/src/ChildType",
+		"ParentType" : "../demos/requirejs/inheritance/src/ParentType"
 	}
 });
 

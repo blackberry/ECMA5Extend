@@ -1,6 +1,9 @@
 # ECMA5Extend
 
-Small toolkit for writing good JavaScript APIs. Currenlty, it is a RequireJS(http://requirejs.org) plugin only, but a distributable library is in the works.
+Small toolkit for writing good JavaScript APIs. It comes in two flavors:
+
+1. RequireJS AMD Plugin (http://requirejs.org/)
+2. Standalone Library
 
 ## Why?
 
@@ -32,13 +35,76 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
-
 ### Structure
+
+1. Standalone Library
 
 ``` javascript
 
-In this example, we define a parent Type, and a child Type that inherits from the parent. the child will inherit the public and protected spaces.
+var parent = {
+	
+		name : "parentType",
+		
+		public : { },
 
+		private : { },
+		
+		protected : { },
+		
+		init : function(){ },
+		
+		destroy : function(){ }
+
+	};
+
+var parent = {
+	
+		name : "childType",
+		
+		public : { },
+
+		private : { },
+		
+		protected : { },
+		
+		init : function(){ },
+		
+		destroy : function(){ }
+
+	};
+	
+```
+
+ECMA5Extend has a single method:
+
+_createType(definition, extends)_
+
+```
+//create both types
+var parentType = ECMA5Extend.createType(parent);
+var childType = ECMA5Extend.createType(child, parent);
+```
+
+Once a type is created, it has a create() method, to spawn instances:
+
+```
+//create instances
+var parentInstance = parentType.create();
+var childInstance = childType.create();
+```
+
+Anything you pass into create, gets passed into the type's init() functions as arguments.
+
+2. RequireJS AMD Plugin (http://requirejs.org/)
+
+To use ECMA5Extend as a RequireJS plugin. You need to:
+
+1. Wrap the module in a define()
+2. Use extend! as a plugin when deriving from parent types
+3. Add an "extend" property that points at what was returned from the extend! plugin
+4. Return the type definition, as with any RequireJS modules
+
+```
 //parent class
 define("parent", function() {
 
@@ -61,7 +127,7 @@ define("parent", function() {
 	};
 
 });
-
+```
 //child class
 define(["extend!parent"], function(parent) {
 
@@ -69,7 +135,7 @@ define(["extend!parent"], function(parent) {
 	
 		name : "childType"
 		
-		extend : parent,
+		extend : parent, //this points at what extend!parent passes into this module
 
 		public : { },
 
@@ -84,8 +150,18 @@ define(["extend!parent"], function(parent) {
 	};
 
 });
+```
+
+The result type will have a ```create()``` method, that creates instances.
 
 ```
+require(["extend!child"], function(childType) {
+
+	var newInstance = childType.create();
+
+});
+```
+
 
 ## Intelligent Event/Notification System
 
