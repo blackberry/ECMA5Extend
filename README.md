@@ -43,11 +43,11 @@ Once an **instance** is created, it has the following public API:
 
 - ```destroy ()``` put destroy code specific to the type here
 - ```subscribe (eventName, listenerFunction)``` subscribe to an event
-	- For example, instance.subscribe("valueChanged", handleValueChanged);
+	- For example, ```instance.subscribe("valueChanged", handleValueChanged);```
 - ```unsubscribe (eventName, listenerFunction)``` unsubscribe from an event
-	- For example, instance.unsubscribe("valueChanged", handleValueChanged);
+	- For example, ```instance.unsubscribe("valueChanged", handleValueChanged);```
 - ```publish (eventName, value1, value2)``` publish an event on current instance
-	- The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments.
+	- The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments. Example: ```instance.publish("valueChanged", newValue, oldValue);```
 
 Look at the Intelligent Event/Notification System section for examples.
 
