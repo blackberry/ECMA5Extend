@@ -37,7 +37,7 @@ What if your child type wants to inherit a non-public method and/or re-implement
 
 ## Structure
 
-### Standalone Library
+### **Standalone Library**
 
 ``` javascript
 
@@ -95,12 +95,12 @@ var childInstance = childType.create();
 
 Anything you pass into create, gets passed into the type's init() functions as arguments.
 
-### RequireJS AMD Plugin (http://requirejs.org/)
+### **RequireJS AMD Plugin (http://requirejs.org/)**
 
 To use ECMA5Extend as a RequireJS plugin. You need to:
 
 1. Wrap the module in a define()
-2. Use extend! as a plugin when deriving from parent types
+2. Import parent Types using the extend! plugin, ```define([extend!parent], function(parentType){ })```
 3. Add an "extend" property that points at what was returned from the extend! plugin
 4. Return the type definition, as with any RequireJS modules
 
