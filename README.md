@@ -277,18 +277,20 @@ To build aurora.js, you will need the following:
 	
 ## Tests
 
-Install jasmine
+Install jasmine-node
 
 ```
 npm install -g jasmine-node
 ```
 
 Run tests:
+
 ```
 jasmine-node --runWithRequireJs .\tests
 ```
 
 If jasmine returns nothing, add --captureExceptions flag
+
 ```
 jasmine-node --runWithRequireJs --captureExceptions .\tests
 ```
