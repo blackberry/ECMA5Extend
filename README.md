@@ -329,16 +329,36 @@ var definition = {
 Access is simple. From anywhere within your type (eg. the init function), use:
 
 ``` javascript
+public : {
+
+	text: null,
+	publicMethod : function(){};
+},
+
+private : {
+
+	waveHello : function(){};
+
+},
+
+protected : {
+
+	draw: function(){};
+},
+
 init : function(){
-	
-	// access to private property
+		
+	// define instance-specific private property
 	this.text = "hi there, I just secretly set the value of text :)";
 	
 	// access to private method
 	this.waveHello();
 	
 	// access to public API (will trigger textChanged event)
-	this.public.text = "hi there!"; 	
+	this.public.text = "hi there!";
+	
+	// call public method
+	this.public.publicMethod(); 	
 
 	//access to protected, will call the parent type's draw if draw isn't reimplemented by the child (self) type
 	this.protected.draw(); 
@@ -346,12 +366,19 @@ init : function(){
 }
 ```
 
+Everything in the type is scoped so ```this``` points at the private of the instance. Whether from getters/setters, public/private/protected methods, ```this``` **always** points at private, so the following work:
+
+- ```this.*``` (access private space)
+- ```this.public.*``` (access public space)
+- ```this.protected.*``` (access protected space)
+
+To the outside world, only ```this.public.*``` is accessible, allowing developers to create clean APIs.
+
 ## Re-implementing parent methods using protected
 
-One of the best features of ECMA5Extend, is the ability to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
+ECMA5Extend allows developers to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
 
-Take a look at demos/inhertance for an example of this.
-
+Take a look at inhertance demos for an example of this.
 
 ## Tests
 
