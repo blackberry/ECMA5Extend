@@ -2,6 +2,8 @@
 
 Toolkit for writing GOOD JavaScript APIs for both Browser and NodeJS using ECMA5.
 
+<hr/>
+
 ## Why?
 
 JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing client and server-side Apps.
@@ -32,7 +34,8 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
-## Structure
+<hr/>
+## Structure and how to use
 
 ECMA5Extend allows developers to clearly define their type definition, that compile into a **type** that have the following public API:
 
@@ -93,12 +96,14 @@ var child = {
 	
 ```
 
-ECMA5Extend has a single method:
+In standalone mode, a global variablt ECMA5Extend has a single method:
 
-_createType(definition, extends)_
+- ```createType(definition, extends)```
+	- where _definition_ is the type definition
+	- _extends_ is the parent type to inherit from
 
 ```
-//create both types
+//Example: create parent and child types
 var parentType = ECMA5Extend.createType(parent);
 var childType = ECMA5Extend.createType(child, parent);
 ```
@@ -183,6 +188,7 @@ require(["extend!child"], function(childType) {
 });
 ```
 
+<hr/>
 
 ## Intelligent Event/Notification System
 
@@ -249,6 +255,8 @@ newType.value = "hi!";
 
 
 ```
+
+<hr/>
 
 ## Using ECMA5 descriptors to define properties
 
@@ -324,6 +332,8 @@ var definition = {
 ...
 ```
 
+<hr/>
+
 ## Accessing private, public, protected
 
 Access is simple. From anywhere within your type (eg. the init function), use:
@@ -351,7 +361,9 @@ init : function(){
 One of the best features of ECMA5Extend, is the ability to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
 
 Take a look at demos/inhertance for an example of this.
-	
+
+<hr/>
+
 ## Tests
 
 Install jasmine-node
@@ -376,6 +388,8 @@ jasmine-node --runWithRequireJs --captureExceptions .\tests
 
 * Anzor Bashkhaz (https://github.com/anzorb)
 * Isaac Gordezky (https://github.com/igordezky)
+
+<hr/>
 
 ## Disclaimer
 
