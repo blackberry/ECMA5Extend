@@ -36,8 +36,9 @@ What if your child type wants to inherit a non-public method and/or re-implement
 
 ECMA5Extend allows developers to clearly define their type definition, that compile into a **type** that have the following public API:
 
-- ```Type.create(params)``` create instance of type and pass params into type's init() method
-
+- ```create (params)``` create instance of type and pass params into type's init() method
+	- example: ```var instance = Type.create();```
+	
 Once an **instance** is created, it has the following public API:
 
 - ```destroy ()``` put destroy code specific to the type here
@@ -95,7 +96,7 @@ var child = {
 
 In standalone mode, a global variablt ECMA5Extend has a single method:
 
-- ```createType(definition, extends)```
+- ```createType (definition, extends)```
 	- where _definition_ is the type definition
 	- _extends_ is the parent type to inherit from
 
@@ -106,8 +107,6 @@ var childType = ECMA5Extend.createType(child, parent);
 ```
 
 A type has the following methods:
-
-
 
 ```
 //create instances
@@ -251,8 +250,6 @@ newType.value = "hi!";
 
 ```
 
-<hr/>
-
 ## Using ECMA5 descriptors to define properties
 
 One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only and write-only properties, but also provide limits on changes among other features.
@@ -326,8 +323,6 @@ var definition = {
    }
 ...
 ```
-
-<hr/>
 
 ## Accessing private, public, protected
 
