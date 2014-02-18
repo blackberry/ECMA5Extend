@@ -36,8 +36,8 @@ What if your child type wants to inherit a non-public method and/or re-implement
 
 It comes in two flavors:
 
-1. RequireJS AMD Plugin (http://requirejs.org/)
-2. Standalone Library
+1. Standalone Library
+2. RequireJS AMD Plugin (http://requirejs.org/)
 
 ### **Standalone Library**
 
