@@ -44,7 +44,7 @@ Once an **instance** is created, it has the following public API:
 - ```subscribe (eventName, listenerFunction)``` subscribe to an event
 - ```unsubscribe (eventName, listenerFunction)``` unsubscribe from an event
 - ```publish (eventName, value1, value2)``` publish an event on current instance
-	The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments.
+	- The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments.
 
 Look at the Intelligent Event/Notification System section for examples.
 
