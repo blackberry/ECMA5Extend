@@ -21,12 +21,11 @@
 			var extendFactory = factory();
 			ECMA5Extend = {
 				createType : function(child, parent) {
-					if (parent){
-						child.extend = extendFactory.createType(parent);	
-					}
-					else
+					if (parent) {
+						child.extend = extendFactory.createType(parent);
+					} else
 						child.extend = null;
-					return extendFactory.createType(child);					
+					return extendFactory.createType(child);
 				}
 			};
 
@@ -425,9 +424,7 @@
 		var extend = {
 
 			write : function(pluginName, moduleName, write) {
-
 				write.asModule(pluginName + "!" + moduleName, "define(['" + moduleName + "', 'extend'],function (module, extend) { return extend.createType(module, '" + moduleName + "' );});\n");
-
 			},
 
 			load : function(name, req, onload, config) {
@@ -448,4 +445,5 @@
 
 		return extend;
 
-	}));
+	})
+); 
