@@ -18,18 +18,16 @@
 define(function() {
 	var AbstractObject = undefined;
 
-	var createType = function(typeDefinition, name) {
+	var createType = function(typeDefinition) {
 		if (!typeDefinition.extend) {
 			if (AbstractObject === undefined) {
 				AbstractObject = null;
-				AbstractObject = createType({
-					definition : abstractObject
-				}, "AbstractObject");
+				AbstractObject = createType(abstractObject);
 			}
 			typeDefinition.extend = AbstractObject;
 		}
 
-		var newType = buildType(typeDefinition, name);
+		var newType = buildType(typeDefinition, typeDefinition.name);
 		buildPrototype(typeDefinition, newType);
 		buildConstructor(typeDefinition, newType);
 
@@ -91,7 +89,6 @@ define(function() {
 
 	var definePreChainedFunction = function(object, propertyName, value, instancePrivate) {
 		var wrapperFunction = function() {
-			//console.log(arguments[0]);
 			if (wrapperFunction.chained) {
 				wrapperFunction.chained.apply(wrapperFunction, arguments);
 			}
@@ -154,7 +151,7 @@ define(function() {
 				value : Object.create(null, {
 					name : {
 						enumerable : true,
-						value : "Class<" + name + ">"
+						value : "Type<" + name + ">"
 					}
 				})
 			},
@@ -180,12 +177,12 @@ define(function() {
 	};
 
 	var buildConstructor = function(definition, newType) {
-		var public = definition.definition.public;
-		var protected = definition.definition.protected;
-		var private = definition.definition.private;
-		var objectInit = definition.definition.init ? definition.definition.init : function() {
+		var public = definition.public;
+		var protected = definition.protected;
+		var private = definition.private;
+		var objectInit = definition.init ? definition.init : function() {
 		};
-		var objectDestroy = definition.definition.destroy ? definition.definition.destroy : function() {
+		var objectDestroy = definition.destroy ? definition.destroy : function() {
 		};
 		var _this = this;
 
@@ -300,6 +297,8 @@ define(function() {
 	};
 
 	var abstractObject = {
+		
+		name : "AbstractObject",
 
 		private : {
 
@@ -328,7 +327,6 @@ define(function() {
 
 			//run a method by name and pass data aka notify
 			publish : function(eventName, newValue, oldValue, internalOnly) {
-				//console.log(eventName === "onActiveTabChanged");
 				if (this[eventName]) {
 					this[eventName](newValue, oldValue);
 				}
@@ -417,11 +415,11 @@ define(function() {
 		load : function(name, req, onload, config) {
 
 			req([name], function(typeDefinition) {
-
+				
 				if (config.isBuild) {
 					return onload();
 				}
-				var newType = createType(typeDefinition, name);
+				var newType = createType(typeDefinition);
 				onload(newType);
 			});
 

@@ -15,57 +15,46 @@
  * limitations under the License.
  */
 
-define("ParentClass", function() {
+define("ChildType", ["extend!./ParentType"], function(ParentType) {
 
-	var someType = {
+	return {
+		
+		name : "ChildType",
+		
+		extend : ParentType,
 
 		public : {
 			
-			value : null,
-			
-			anotherValue : null
+			childValue : null					
 			
 		},
 
 		private : {
 			
-			valueChanged : function valueChanged(newValue){
-				// call the protected method
-				this.protected.valueChanged(newValue);
-			},
-			
-			anotherValueChanged : function valueChanged(newValue){
-				// call the protected method
-				this.protected.anotherValueChanged(newValue);
+			childValueChanged : function childValueChanged(newValue){
+				console.log("ChildType: childValue changed to " + newValue);
 			}
-			
+					
 		},
 		
 		protected : {
 			
-			valueChanged : function valueChanged(newValue){		
-				console.log("[protected] ParentClass: value changed to " + newValue);
-			},
-			
-			anotherValueChanged : function valueChanged(newValue){		
-				//example of protected that is not implemented by the child type
-				console.log("[protected implemented in ParentClass]: value changed to " + newValue);				
+			// implement parent's protected method, with Child's own
+			valueChanged : function valueChanged(newValue){
+				console.log("[protected] ChildType: value changed to " + newValue);
 			},
 						
 		},
 		
 		init : function init(){
-			console.log("ParentClass init");			
+			console.log("ChildType init");
+			
 		},
 		
 		destroy : function destroy(){
 			
 		}
 
-	};
-
-	return {
-		definition : someType
 	};
 
 });
