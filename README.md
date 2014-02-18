@@ -35,9 +35,9 @@ Think of a thermostat, you don't have control over heat or cold directly. You se
 
 What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
 
-### Structure
+## Structure
 
-1. Standalone Library
+### Standalone Library
 
 ``` javascript
 
@@ -57,7 +57,7 @@ var parent = {
 
 	};
 
-var parent = {
+var child = {
 	
 		name : "childType",
 		
@@ -95,7 +95,7 @@ var childInstance = childType.create();
 
 Anything you pass into create, gets passed into the type's init() functions as arguments.
 
-2. RequireJS AMD Plugin (http://requirejs.org/)
+### RequireJS AMD Plugin (http://requirejs.org/)
 
 To use ECMA5Extend as a RequireJS plugin. You need to:
 
