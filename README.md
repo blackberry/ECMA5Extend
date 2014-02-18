@@ -184,6 +184,56 @@ require(["extend!child"], function(childType) {
 });
 ```
 
+## Access to private, public, protected spaces
+
+Access is simple. From anywhere within your type (eg. the init function), use:
+
+``` javascript
+public : {
+
+	text: null,
+	publicMethod : function(){};
+},
+
+private : {
+
+	waveHello : function(){};
+
+},
+
+protected : {
+
+	draw: function(){};
+},
+
+init : function(){
+		
+	// define instance-specific private property
+	this.text = "hi there, I just secretly set the value of text :)";
+	
+	// access to private method
+	this.waveHello();
+	
+	// access to public API (will trigger textChanged event)
+	this.public.text = "hi there!";
+	
+	// call public method
+	this.public.publicMethod(); 	
+
+	//access to protected, will call the parent type's draw if draw isn't reimplemented by the child (self) type
+	this.protected.draw(); 
+
+}
+```
+
+Everything in the type is scoped so ```this``` points at the private of the instance. Whether from getters/setters, public/private/protected methods, ```this``` **always** points at private, so the following work:
+
+- ```this.*``` (access private space)
+- ```this.public.*``` (access public space)
+- ```this.protected.*``` (access protected space)
+
+To the outside world, only ```this.public.*``` is accessible, allowing developers to create clean APIs.
+
 ## Intelligent Event/Notification System
 
 ECMA5Extend has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
@@ -323,56 +373,6 @@ var definition = {
    }
 ...
 ```
-
-## Accessing private, public, protected
-
-Access is simple. From anywhere within your type (eg. the init function), use:
-
-``` javascript
-public : {
-
-	text: null,
-	publicMethod : function(){};
-},
-
-private : {
-
-	waveHello : function(){};
-
-},
-
-protected : {
-
-	draw: function(){};
-},
-
-init : function(){
-		
-	// define instance-specific private property
-	this.text = "hi there, I just secretly set the value of text :)";
-	
-	// access to private method
-	this.waveHello();
-	
-	// access to public API (will trigger textChanged event)
-	this.public.text = "hi there!";
-	
-	// call public method
-	this.public.publicMethod(); 	
-
-	//access to protected, will call the parent type's draw if draw isn't reimplemented by the child (self) type
-	this.protected.draw(); 
-
-}
-```
-
-Everything in the type is scoped so ```this``` points at the private of the instance. Whether from getters/setters, public/private/protected methods, ```this``` **always** points at private, so the following work:
-
-- ```this.*``` (access private space)
-- ```this.public.*``` (access public space)
-- ```this.protected.*``` (access protected space)
-
-To the outside world, only ```this.public.*``` is accessible, allowing developers to create clean APIs.
 
 ## Re-implementing parent methods using protected
 
