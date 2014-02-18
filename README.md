@@ -1,6 +1,6 @@
 # ECMA5Extend
 
-Small toolkit for writing good JavaScript APIs.
+Toolkit for writing GOOD JavaScript APIs for both Browser and NodeJS using ECMA5.
 
 ## Why?
 
@@ -233,7 +233,7 @@ newType.value = "hi!";
 
 ## Using ECMA5 descriptors to define properties
 
-One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only properties, but also provide limits on changes among other features.
+One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only and write-only properties, but also provide limits on changes among other features.
 
 
 ``` javascript
