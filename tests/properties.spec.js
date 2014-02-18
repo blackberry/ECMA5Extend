@@ -1,10 +1,11 @@
-require.config({	
+require.config({
 	paths : {
 		"extend" : "../src/extend",
+		"SomeType" : "../demos/properties/src/SomeType"
 	}
 });
 
-require(['extend!../demos/properties/src/SomeType'], function(type) {
+require(['extend!SomeType'], function(type) {
 
 	describe('Basics', function() {
 

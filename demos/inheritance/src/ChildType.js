@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-define("ChildType", ["extend!./ParentType"], function(ParentType) {
+define("ChildType", ["extend!ParentType"], function(ParentType) {
 
 	return {
 		

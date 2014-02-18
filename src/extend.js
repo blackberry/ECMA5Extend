@@ -414,7 +414,7 @@ define(function() {
 
 		load : function(name, req, onload, config) {
 
-			req([name], function(typeDefinition) {
+			req([name], function(typeDefinition) {	
 				
 				if (config.isBuild) {
 					return onload();
