@@ -253,27 +253,6 @@ init : function(){
 One of the best features of ECMA5Extend, is the ability to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
 
 Take a look at demos/inhertance for an example of this.
-
-## How to build
-
-To build aurora.js, you will need the following:
-
-* node.js (http://nodejs.org)
-* npm (node package manager) (http://nodejs.org)
-* grunt (http://gruntjs.com)
-
-1. First, install grunt globally:
-	```
-	npm install -g grunt-cli
-	```
-2. Install dependencies, run:
-	```
-	npm install
-	```
-3. Run grunt:
-	```
-	grunt
-	```
 	
 ## Tests
 
