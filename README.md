@@ -36,14 +36,14 @@ What if your child type wants to inherit a non-public method and/or re-implement
 
 ECMA5Extend allows developers to clearly define their type definition, that compile into a **type** that have the following public API:
 
-- _create(params)_ create instance of type and pass params into type's init() method
+- ```Type.create(params)``` create instance of type and pass params into type's init() method
 
 Once an **instance** is created, it has the following public API:
 
-- ```destroy()``` put destroy code specific to the type here
-- ```subscribe(eventName, listenerFunction)``` subscribe to an event
-- ```unsubscribe(eventName, listenerFunction)``` unsubscribe from an event
-- ```publish(eventName, value1, value2, internalOnly)``` publish an event on current instance
+- ```destroy ()``` put destroy code specific to the type here
+- ```subscribe (eventName, listenerFunction)``` subscribe to an event
+- ```unsubscribe (eventName, listenerFunction)``` unsubscribe from an event
+- ```publish (eventName, value1, value2)``` publish an event on current instance
 	The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments.
 
 Look at the Intelligent Event/Notification System section for examples.
