@@ -40,10 +40,13 @@ ECMA5Extend allows developers to clearly define their type definition, that comp
 
 Once an **instance** is created, it has the following public API:
 
-- _destroy()_ put destroy code specific to the type here
-- _subscribe(eventName, listenerFunction)_ subscribe to an event
-- _unsubscribe(eventName, listenerFunction)_ unsubscribe from an event
-- _publish(eventName, value1, value2, internalOnly)_ publish an event on type
+- ```destroy()``` put destroy code specific to the type here
+- ```subscribe(eventName, listenerFunction)``` subscribe to an event
+- ```unsubscribe(eventName, listenerFunction)``` unsubscribe from an event
+- ```publish(eventName, value1, value2, internalOnly)``` publish an event on current instance
+	The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments.
+
+Look at the Intelligent Event/Notification System section for examples.
 
 ECMA5Extend comes in two flavors:
 
@@ -183,8 +186,9 @@ require(["extend!child"], function(childType) {
 
 ECMA5Extend has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
 
-- Setting the public property to a specific value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private get notified of the change.
+- Setting the public property to a specific value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private and public get notified of the change.
 - Setting the private property to a specific value allows you to go behind the property's back if you don't want to alarm the subscribers.
+- Developers can manually publish events using the ```instance.publish()``` method
 
 Example:
 
