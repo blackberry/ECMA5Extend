@@ -23,7 +23,7 @@ Copyright 2013 Research In Motion
 		<script src="../../../src/extend.js"></script>
 		<script src="src/SomeType.js"></script>
 		<script>
-			var someType = ECMA5Extend.createType(SomeType);
+			window.someType = ECMA5Extend.createType(SomeType);
 			
 			var someTypeInstance = someType.create();
 			someTypeInstance.value = "hi!";

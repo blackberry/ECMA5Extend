@@ -34,7 +34,20 @@ What if your child type wants to inherit a non-public method and/or re-implement
 
 ## Structure
 
-It comes in two flavors:
+ECMA5Extend allows developers to clearly define their type definitions, that compile into types that have the following public API:
+
+Type:
+- _create(params)_ create instance of type and pass params into type's init() method
+
+Once an instance is created, it has the following public API:
+
+Instance:
+- _destroy()_ put destroy code specific to the type here
+- _subscribe(eventName, listenerFunction)_ subscribe to an event
+- _unsubscribe(eventName, listenerFunction)_ unsubscribe from an event
+- _publish(eventName, value1, value2, internalOnly)_ publish an event on type
+
+ECMA5Extend comes in two flavors:
 
 1. Standalone Library
 2. RequireJS AMD Plugin (http://requirejs.org/)
@@ -87,7 +100,9 @@ var parentType = ECMA5Extend.createType(parent);
 var childType = ECMA5Extend.createType(child, parent);
 ```
 
-Once a type is created, it has a create() method, to spawn instances:
+A type has the following methods:
+
+
 
 ```
 //create instances
