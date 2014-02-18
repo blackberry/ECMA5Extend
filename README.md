@@ -4,7 +4,7 @@ Toolkit for writing GOOD JavaScript APIs for both Browser and NodeJS using ECMA5
 
 ## Why?
 
-JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing Apps.
+JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing client and server-side Apps.
 
 **As JavaScript evolves, so should the developers that use it.**
 
@@ -14,10 +14,10 @@ A mature programming language provides:
 - Public, private and protected API
 - Intelligent event system
 
-Some of these are coming in ECMA6, and it will take years for browsers to implement it, plus the syntax changes.
+Some of these are coming in ECMA6, which may take years for browsers to implement, plus the syntax changes drastically.
 This is why, after many painful projects, we've developed ExtendJS. 
 
-Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not use the "new" keyword and instead relies on inheritance using ECMA5 Object.create(). 
+Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not use the "new" keyword and instead relies on inheritance using ECMA5 Object.create(). Unlike others, ECMA5Extend also offers protected, which comes very handy in large projects.
 
 ### Why inheritance?
 
