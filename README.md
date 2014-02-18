@@ -276,8 +276,8 @@ jasmine-node --runWithRequireJs --captureExceptions .\tests
 
 **Author** 
 
-* Isaac Gordezky (https://github.com/igordezky)
 * Anzor Bashkhaz (https://github.com/anzorb)
+* Isaac Gordezky (https://github.com/igordezky)
 
 ## Disclaimer
 
