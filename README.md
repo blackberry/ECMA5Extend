@@ -378,11 +378,10 @@ If jasmine returns nothing, add --captureExceptions flag
 jasmine-node --runWithRequireJs --captureExceptions .\tests
 ```
 
-**Author** 
+## Authors 
 
 * Anzor Bashkhaz (https://github.com/anzorb)
 * Isaac Gordezky (https://github.com/igordezky)
-
 
 ## Disclaimer
 
