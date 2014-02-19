@@ -328,7 +328,6 @@ One of the amazing parts of ECMA5Extend is that developers are able to define pr
 		public : {
 			
 			value : {
-				enumerable: true,
 				get: function(){
 					return this.value;				
 				},
