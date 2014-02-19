@@ -122,12 +122,12 @@ Anything you pass into create, gets passed into the type's init() functions as a
 NodeJS module is exactly the same as the standalone version, except using module.exports
 
 ``` javascript
-var Extend = require("./ECMA5Extend.js"),
+var ECMA5Extend = require("./ECMA5Extend.js"),
 	Parent = require("./ParentType.js"),
 	Child = require("./ChildType.js");
 
-var ParentType = Extend.createType(Parent);
-var ChildType = Extend.createType(Child, Parent);
+var ParentType = ECMA5Extend.createType(Parent);
+var ChildType = ECMA5Extend.createType(Child, Parent);
 
 var parentInstance = ParentType.create();
 var childInstance = ChildType.create();
@@ -167,7 +167,7 @@ define("parent", function() {
 });
 
 //child class
-define(["extend!parent"], function(parent) {
+define(["ECMA5Extend!parent"], function(parent) {
 
 	return {
 	
@@ -193,7 +193,7 @@ define(["extend!parent"], function(parent) {
 The result type will have a ```create()``` method, that creates instances.
 
 ```
-require(["extend!child"], function(childType) {
+require(["ECMA5Extend!child"], function(childType) {
 
 	var newInstance = childType.create();
 

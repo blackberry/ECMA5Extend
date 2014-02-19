@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-var Extend = require("../../../src/ECMA5Extend.js"),
+var ECMA5Extend = require("../../../src/ECMA5Extend.js"),
 	Parent = require("./ParentType.js"),
 	Child = require("./ChildType.js");
 
-var ParentType = Extend.createType(Parent);
-var ChildType = Extend.createType(Child, Parent);
+var ParentType = ECMA5Extend.createType(Parent);
+var ChildType = ECMA5Extend.createType(Child, Parent);
 
 //extend returns a type with method "create"
 var parentInstance = ParentType.create();
