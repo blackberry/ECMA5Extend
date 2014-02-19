@@ -29,6 +29,12 @@
 				}
 			};
 
+			if (typeof module !== "undefined") {
+				module.exports = {
+					createType : ECMA5Extend.createType
+				};
+			}
+
 		}
 
 	}(this, function() {
@@ -446,4 +452,4 @@
 		return extend;
 
 	})
-); 
+);

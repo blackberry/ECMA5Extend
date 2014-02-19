@@ -51,10 +51,11 @@ Once an **instance** is created, it has the following public API:
 
 Look at the Intelligent Event/Notification System section for examples.
 
-ECMA5Extend comes in two flavors:
+ECMA5Extend comes in three flavors:
 
 1. Standalone Library
-2. RequireJS AMD Plugin (http://requirejs.org/)
+2. NodeJS module
+3. RequireJS AMD Plugin (http://requirejs.org/)
 
 ### **Standalone Library**
 
@@ -116,6 +117,22 @@ var childInstance = childType.create();
 
 Anything you pass into create, gets passed into the type's init() functions as arguments.
 
+### NodeJS module (commonJS)
+
+NodeJS module is exactly the same as the standalone version, except using module.exports
+
+``` javascript
+var Extend = require("./ECMA5Extend.js"),
+	Parent = require("./ParentType.js"),
+	Child = require("./ChildType.js");
+
+var ParentType = Extend.createType(Parent);
+var ChildType = Extend.createType(Child, Parent);
+
+var parentInstance = ParentType.create();
+var childInstance = ChildType.create();
+```
+
 ### **RequireJS AMD Plugin (http://requirejs.org/)**
 
 To use ECMA5Extend as a RequireJS plugin. You need to:
@@ -148,7 +165,6 @@ define("parent", function() {
 	};
 
 });
-
 
 //child class
 define(["extend!parent"], function(parent) {

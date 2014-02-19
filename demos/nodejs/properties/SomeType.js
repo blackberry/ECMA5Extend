@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-SomeType = {
+module.exports = {
 
 	name : "SomeType",
 
