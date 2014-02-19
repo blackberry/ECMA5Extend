@@ -117,7 +117,7 @@ var childInstance = childType.create();
 
 Anything you pass into create, gets passed into the type's init() functions as arguments.
 
-### NodeJS module (commonJS)
+### **NodeJS module (commonJS)**
 
 NodeJS module is exactly the same as the standalone version, except using module.exports
 
@@ -133,7 +133,7 @@ var parentInstance = ParentType.create();
 var childInstance = ChildType.create();
 ```
 
-### **RequireJS AMD Plugin (http://requirejs.org/)**
+### **RequireJS Plugin (http://requirejs.org/)**
 
 To use ECMA5Extend as a RequireJS plugin. You need to:
 
