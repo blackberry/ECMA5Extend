@@ -395,6 +395,7 @@ ECMA5Extend allows developers to declare protected methods. Protected methods al
 
 Take a look at inhertance demos for an example of this.
 
+
 ## Tests
 
 Install jasmine-node
