@@ -14,7 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 ( function(root, factory) {
+	
+		"use strict";
+
 		if ( typeof define === 'function' && define.amd) {
 			define(factory);
 		} else {
@@ -29,7 +33,7 @@
 				}
 			};
 
-			if (typeof module !== "undefined") {
+			if ( typeof module !== "undefined") {
 				module.exports = {
 					createType : ECMA5Extend.createType
 				};
