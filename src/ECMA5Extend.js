@@ -23,7 +23,7 @@
 			define(factory);
 		} else {
 			var extendFactory = factory();
-			ECMA5Extend = {
+			var ECMA5Extend = {
 				createType : function(child, parent) {
 					if (parent) {
 						child.extend = extendFactory.createType(parent);
@@ -32,8 +32,11 @@
 					return extendFactory.createType(child);
 				}
 			};
-
-			if ( typeof module !== "undefined") {
+			
+			if ( typeof window !== "undefined"){
+				window.ECMA5Extend = ECMA5Extend;
+			}
+			else if ( typeof module !== "undefined") {
 				module.exports = {
 					createType : ECMA5Extend.createType
 				};
