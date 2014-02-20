@@ -1,6 +1,6 @@
 {
-  "name": "extendJS",
-  "description": "extendJS",
+  "name": "ECMA5Extend",
+  "description": "JavaScript library using features of the ECMA5 language spec to provide inheritance, public/private/protected APIs, and an intelligent Event System",
   "version": "0.0.1",
   "author": {
     "name": "Isaac Gordezky",
