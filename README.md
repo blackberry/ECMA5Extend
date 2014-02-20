@@ -1,10 +1,10 @@
 # ECMA5Extend
 
-Toolkit for writing GOOD JavaScript APIs for both Browser and NodeJS using ECMA5.
+Toolkit for writing good JavaScript APIs for both Browser and NodeJS using ECMA5.
 
 ## Why?
 
-JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blow language for writing client and server-side Apps.
+JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blown language for writing client and server-side Apps.
 
 **As JavaScript evolves, so should the developers that use it.**
 

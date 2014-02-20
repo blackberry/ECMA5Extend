@@ -22,6 +22,7 @@ Copyright 2013 Research In Motion
 	<body>
 		<script src="../../../src/ECMA5Extend.js"></script>
 		<script>
+		
 			var CatDescriptor = {
 				name : "Cat",
 				public : {
@@ -49,7 +50,6 @@ Copyright 2013 Research In Motion
 			var MuteCat = ECMA5Extend.createType(MuteCatDescriptor, CatDescriptor);
 
 			console.log(MuteCat.create().makesNoise()); //returns false
-			// the cat it mute but it makes noises?
 
 		</script>
 	</body>
