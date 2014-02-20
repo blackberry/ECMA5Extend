@@ -393,7 +393,36 @@ var definition = {
 
 ECMA5Extend allows developers to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
 
-Take a look at inhertance demos for an example of this.
+``` javascript
+var CatDescriptor = {
+	name : "Cat",
+	public : {
+		makesNoise : function() {
+			return this.protected.meows();
+		}
+	},
+	protected : {
+		meows : function() {
+			return true;
+		}
+	},
+};
+
+var MuteCatDescriptor = {
+	name : "MuteCat",
+	//re-implement Cat's meows to return false
+	protected : {
+		meows : function() {
+			return false;
+		}
+	},
+};
+
+var Cat = ECMA5Extend.createType(CatDescriptor);
+var MuteCat = ECMA5Extend.createType(MuteCatDescriptor, CatDescriptor);
+
+console.log(MuteCat.create().makesNoise()); //returns false
+```
 
 
 ## Tests
