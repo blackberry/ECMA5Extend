@@ -1,4 +1,4 @@
-/* Copyright 2013 Research In Motion
+/* Copyright 2013 BlackBerry Limited
  * @author: Anzor Bashkhaz
  * @author: Isaac Gordezky
  *
