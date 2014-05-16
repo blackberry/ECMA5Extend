@@ -1,0 +1,25 @@
+{
+    "node": true,
+    "browser": true,
+    "esnext": true,
+    "bitwise": false,
+    "eqeqeq": true,
+    "eqnull": true,
+    "immed": true,
+    "latedef": true,
+    "noarg": true,
+    "undef": true,
+    "strict": false,
+    "globals": {
+        "$": false,
+        "aurora": false,
+        "Backbone": false,
+        "describe": false,
+        "it": false,
+        "before": false,
+        "beforeEach": false,
+        "after": false,
+        "afterEach": false,
+        "expect": false
+    }
+}

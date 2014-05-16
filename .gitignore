@@ -1,6 +1,8 @@
+node_modules
+npm-debug.log
+tmp
+artifact
+docs
 .project
-/platforms/
-/plugins/
-/merges/
-/node_modules/
-/sample/app.js
+test/browserified_mocha_unit_tests.js
+test/browserified_libs.js
