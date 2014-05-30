@@ -1,19 +1,19 @@
 /* Copyright 2013 BlackBerry Limited
- * @author: Isaac Gordezky
- * @author: Anzor Bashkhaz
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* @author: Isaac Gordezky
+* @author: Anzor Bashkhaz
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 /**
  * ECMA5Extend client-side module
@@ -35,12 +35,16 @@ if ( typeof Object.setPrototypeOf === "undefined") {
     Object.defineProperties(Object, {
         "getPrototypeOf" : {
             value : function getPrototypeOf(object) {
-                return object.__proto__; // jshint ignore:line
+                /* jshint ignore:start */
+                return object.__proto__;
+                /* jshint ignore:end */
             }
         },
         "setPrototypeOf" : {
             value : function setPrototypeOf(object, proto) {
-                object.__proto__ = proto; // jshint ignore:line
+                /* jshint ignore:start */
+                object.__proto__ = proto;
+                /* jshint ignore:end */
             }
         }
     });
@@ -228,7 +232,7 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
         }
 
         // we are is the 'final' type
-        if (Object.getPrototypeOf(this) === _public) {            
+        if (Object.getPrototypeOf(this) === _public) {
             Object.defineProperties(priv.protected, {
                 "public" : {
                     value : undefined
@@ -242,7 +246,7 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
             });
 
             Object.setPrototypeOf(priv.protected, Object.prototype);
-            
+
             Object.defineProperties(priv.public, {
                 "__id" : {
                     value : undefined
@@ -258,7 +262,7 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
                 Object.setPrototypeOf(priv.public, proto);
             } else {
                 Object.setPrototypeOf(priv.public, Object.prototype);
-            }            
+            }
         }
         Object.defineProperties(priv, {
             "protected" : {
@@ -279,6 +283,22 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
 };
 
 // ---------------------------------------------------------
+var propertyDescriptorNames = ["configurable", "enumerable", "writable", "set", "get", "value", "publish"];
+var isPropertyDescriptor = function(obj) {
+    if ( typeof obj !== "object" || obj === null) {
+        return false;
+    }
+
+    var keys = Object.getOwnPropertyNames(obj);
+
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        if (propertyDescriptorNames.indexOf(key) === -1) {
+            return false;
+        }
+    }
+    return (keys.length > 0);
+};
 
 var extendMixin = function(mixin) {
     var okeys = Object.keys(Object.prototype);
@@ -301,7 +321,9 @@ var extendMixin = function(mixin) {
 var extendPrivateScope = function(definition, privateDefn) {
     Object.getOwnPropertyNames(definition.private || {}).forEach(function(key) {
         var defn = definition.private[key];
-        if (!(defn.value || defn.get || defn.set)) {
+        if (isPropertyDescriptor(defn)) {
+            privateDefn[key] = defn;
+        } else {
             privateDefn[key] = {
                 configurable : true,
                 writable : true,
@@ -328,27 +350,6 @@ var extendPrivateScope = function(definition, privateDefn) {
     privateDefn.getPrivate = {
         value : getPrivate
     };
-};
-
-var propertyDescriptorNames = ["configurable", "enumerable", "writable", "set", "get", "value", "publish"];
-var isPropertyDescriptor = function(obj) {
-    if ( typeof obj !== "object" || obj === null) {
-        return false;
-    }
-
-    var keys = Object.getOwnPropertyNames(obj);
-
-    for (var i = 0; i < keys.length; i++) {
-        if (i > propertyDescriptorNames.length) {
-            return false;
-        }
-
-        var key = keys[i];
-        if (propertyDescriptorNames.indexOf(key) === -1) {
-            return false;
-        }
-    }
-    return true;
 };
 
 /*
@@ -519,12 +520,11 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
 };
 
 var isHTMLType = function(object) {
-    if (typeof window === "undefined" || typeof window.Node === "undefined" || typeof object === "undefined") {
+    if ( typeof window === "undefined" || typeof window.Node === "undefined" || typeof object === "undefined") {
         return false;
     }
     return (object.prototype instanceof window.Node || object instanceof window.Node);
 };
-
 
 /**
  * check if an object is an ecma5-extend type
@@ -533,7 +533,7 @@ var isHTMLType = function(object) {
  * @returns {Boolean}
  */
 var isType = function isType(type) {
-    if (typeof type.__id === "number") {
+    if ( typeof type.__id === "number") {
         return (typeRegistry[type.__id] === type);
     } else {
         return false;

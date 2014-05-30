@@ -1,18 +1,18 @@
 /* Copyright 2013 BlackBerry Limited
- * @author: Isaac Gordezky
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* @author: Isaac Gordezky
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 /*jshint expr: true*/
 //var expect = require("chai").expect;
@@ -20,7 +20,8 @@ var Extend = require('ecma5-extend');
 
 var baseDefinition = require('../types/base.js');
 var derivedDefinition = require('../types/derived.js');
-var BaseType, DerivedType;
+var simpleDefinition = require('../types/simple.js');
+var BaseType, DerivedType, SimpleType;
 
 describe('../types/base.js', function() {
 
@@ -33,6 +34,11 @@ describe('../types/base.js', function() {
         it('create DerivedClass', function() {
             DerivedType = Extend.createType(derivedDefinition);
             typeTester(DerivedType, "DerivedClass");
+        });
+        
+        it('create SimpleClass', function() {
+            SimpleType = Extend.createType(simpleDefinition);
+            typeTester(SimpleType, "SimpleClass");
         });
     });
 
@@ -71,23 +77,52 @@ describe('../types/base.js', function() {
         });
 
         it('empty verbose property', function() {
-            propertyTester(this.base, "g", undefined, true, true);
+            propertyTester(this.base, "g", {}, true, true);
         });
 
-        it('empty verbose property', function() {
+        it('null property', function() {
             propertyTester(this.base, "h", null, true, true);
         });
 
-        it('empty verbose property', function() {
+        it('undefined property', function() {
             propertyTester(this.base, "i", undefined, true, true);
         });
 
-        it('empty verbose property', function() {
-            propertyTester(this.base, "q", {
+        it('not quite a property descriptor', function() {
+            propertyTester(this.base, "j", {
                 writable : false,
                 value : 1,
                 name : "hi"
             }, true, true);
+        });
+
+        it('private property: undefined', function() {
+            expect(this.base.getPrivate("q").value).to.equal(undefined);
+        });
+
+        it('private property: null', function() {
+            expect(this.base.getPrivate("r").value).to.equal(null);
+        });
+
+        it('private property: {}', function() {
+            expect(this.base.getPrivate("s").value).to.deep.equal({});
+        });
+
+        it('private property: {value}', function() {
+            expect(this.base.getPrivate("t").value).to.equal("t");
+        });
+
+        it('private property: {full-value}', function() {
+            expect(this.base.getPrivate("u").value).to.equal("u");
+            expect(this.base.getPrivate("u").writable).to.equal(false);
+            expect(this.base.getPrivate("u").configurable).to.equal(true);
+        });
+
+        it('private property: {get-set}', function() {
+            expect(this.base.getPrivate("v").get).to.be.a("function");
+            expect(this.base.getPrivate("v").set).to.be.a("function");
+            this.base.getPrivate("v").set.call(this.base,101);
+            expect(this.base.getPrivate("v").get.call(this.base)).to.equal(101);
         });
 
         it('standalone accessor message (getX)', function() {

@@ -30,7 +30,6 @@ module.exports = function(config) {
         frameworks: ['mocha', 'chai', 'sinon'],
         reporters: ['dots', 'junit', 'coverage'],
         files: [
-            'test/browserified_libs.js',
             'test/browserified_mocha_*.js'
         ],
         exclude: [],
