@@ -20,20 +20,23 @@ module.exports = {
 
     name : "SimpleClass",
 
-    extend : Array,
+    extend : Object,
 
     /*tagName : "EL-BASECLASS",*/
 
     private : {
-        
+        x : undefined,
+        y : {},
+        z : undefined
     },
 
     public : {
-        
+        a : undefined
     },
 
     protected : {
-        
+        b : undefined,
+        c : {}
     },
 
     init : function() {

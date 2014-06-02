@@ -558,11 +558,12 @@ var createType = function(definition) {
     });
 
     var baseTypeDefinition = definition.extend;
+
     var baseType = null, _type;
     var ultimateType = true;
     if (!baseTypeDefinition) {
         _type = {};
-    } else if ( typeof baseTypeDefinition.create === "function") {
+    } else if ( typeof baseTypeDefinition.create === "function" && baseTypeDefinition !== Object) {
         baseType = baseTypeDefinition;
         _type = Object.create(baseType);
         ultimateType = false;
