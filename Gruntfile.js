@@ -81,34 +81,45 @@ module.exports = function(grunt) {
                 }
             }
         },
-
         jsdoc : {
-            dist : {
-                src : ["src/ecma5-extend.js"],
-                options : {
-                    destination : "docs",
-                    private : false
-                }
+            src : ['src/**/*.js'],
+            options : {
+                destination : "docs",
+                private : false
+
             }
         },
-
         jscs : {
-            src : ['!Gruntfile.js', 'src/**/*.js', '!test/*/*.js', '!src/lib/ecma5-extend.js'],
+            src : ['!Gruntfile.js', 'src/**/*.js', 'test/**/*.js', '!test/browserified_*.js'],
             options : {
                 config : ".jscsrc",
+                reporter : "jscs-reporter.js"
             }
         },
 
         jshint : {
-            all : ["Gruntfile.js", "src/*.js"],
-            options : {
-                jshintrc : ".jshintrc",
+            dev : {
+                options : {
+                    jshintrc : '.jshintrc',
+                    reporter : require('jshint-stylish')
+                },
+                // There is only one * on the test/* folder because we don't want to
+                // pick up the browserified test files, only the raw source ones.
+                src : ['src/**/*.js', 'test/**/*.js', '!test/browserified_*.js']
             },
+            ci : {
+                options : {
+                    jshintrc : '.jshintrc',
+                    // reporter : require('jshint-jenkins-checkstyle-reporter'),
+                    reporterOutput : 'artifact/report-jshint-checkstyle.xml'
+                },
+                src : ['src/**/*.js', 'test/*/**/*.js']
+            }
         },
 
         open : {
             unit : {
-                path : 'http://localhost:<%= connect.options.port %>/test/unit-tests.html'
+                path : 'http://0.0.0.0:<%= connect.options.port %>/test/unit-tests.html'
             }
         },
 
@@ -116,7 +127,7 @@ module.exports = function(grunt) {
             options : {
                 port : 9002,
                 // change this to '0.0.0.0' to access the server from outside
-                hostname : 'localhost'
+                hostname : '0.0.0.0'
             },
             tdd : {
                 options : {
@@ -139,7 +150,7 @@ module.exports = function(grunt) {
 
         complexity : {
             generic : {
-                src : ['src/*.js'],
+                src : ['src/**/*.js'],
                 options : {
                     breakOnErrors : false,
                     errorsOnly : false,
@@ -157,26 +168,84 @@ module.exports = function(grunt) {
                 configFile : 'karma.conf.js',
                 runnerPort : 9999,
             },
-            unit : {
+            desktop : {
                 browsers : ['Chrome', 'Firefox'],
                 logLevel : 'INFO',
-                /*singleRun: false,*/
                 coverageReporter : {
                     type : 'html',
                     dir : 'artifact/'
                 }
+            },
+            bb10 : {
+                browsers : ['bb10'],
+                logLevel : 'INFO',
+                reporters : ['dots']
+            },
+            full : {
+                browsers : ['Chrome', 'Firefox', 'bb10'],
+                logLevel : 'INFO',
+                coverageReporter : {
+                    type : 'html',
+                    dir : 'artifact/'
+                }
+            },
+            sanity : {
+                browsers : ['Chrome'],
+                logLevel : 'WARN',
+                reporters : ['dots']
+                /*singleRun: false,*/
+            }
+        },
+        githooks : {
+            all : {
+                // Will run the jscs and jshint
+                'pre-commit' : 'validate:ci browserify:tests karma:sanity',
             }
         }
     });
 
+    grunt.registerTask('launchBrowser:bb10', 'Launches the BB10 browser', function() {
+        var done = this.async();
+        var deviceParams = {
+            'launchApp' : '169.254.0.1',
+            'package-name' : 'sys.browser',
+            'package-id' : 'gYABgJYFHAzbeFMPCCpYWBtHAm0',
+            'password' : process.env.BBPASSWORD || 'qwerty'
+        };
+
+        var cmd = '';
+        for (var j in deviceParams) {
+            cmd += ' -' + j + ' ' + deviceParams[j];
+        }
+
+        require('child_process').exec('blackberry-deploy ' + cmd, function(err) {
+            setTimeout(function() {
+                done();
+            }, 2000);
+            if (err) {
+                if (!err.killed) {
+                    grunt.fail.fatal(err.toString());
+                } else {
+                    grunt.fail.fatal("task was killed");
+                }
+            }
+        });
+    });
+
+    grunt.registerTask('launchBrowser', ['launchBrowser:bb10']);
+
     // Whenever the "test" task is run, first clean the "tmp" dir, then run this
     // plugin's task(s), then test the result.
-    grunt.registerTask('validate', ['jshint', 'jscs', 'complexity']);
+    grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity']);
+    grunt.registerTask('validate:ci', ['jscs', 'jshint:ci', 'complexity']);
     grunt.registerTask('browser-test', ['browserify:dist']);
     grunt.registerTask('docs', ['jsdoc']);
 
     grunt.registerTask('tdd', ['browserify:tests', 'connect:tdd', 'open:unit', 'watch:tdd']);
-    grunt.registerTask('test', ['clean', 'browserify:tests', 'karma:unit']);
+    grunt.registerTask('test', ['clean', 'browserify:tests', 'karma:desktop']);
+    grunt.registerTask('test:bb10', ['clean', 'browserify:tests', 'launchBrowser:bb10', 'karma:bb10']);
+
+    grunt.registerTask('ci', ['clean', 'validate:ci', 'browserify:tests', 'launchBrowser', 'karma:full']);
 
     // By default, lint and run all tests.
     grunt.registerTask('default', ['validate', 'test']);

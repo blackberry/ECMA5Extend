@@ -17,7 +17,6 @@
 var _f = "f";
 
 module.exports = {
-
     name : "BaseClass",
 
     extend : window.HTMLDivElement,
@@ -27,7 +26,7 @@ module.exports = {
     private : {
         x : 101,
         c : "c",
-        
+
         q : undefined,
         r : null,
         s : {},
@@ -47,7 +46,7 @@ module.exports = {
                 this.__v = value;
             }
         }
-        
+
     },
 
     public : {
@@ -103,7 +102,7 @@ module.exports = {
         runProtected : function(fcnName, a, b, c, d, e, f, g, h, i, j, k) {
             return this.protected[fcnName](a, b, c, d, e, f, g, h, i, j, k);
         },
-        
+
         getPrivate : function(propName) {
             return Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), propName);
         }

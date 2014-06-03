@@ -14,8 +14,6 @@
 * limitations under the License.
 */
 
-/*jshint expr: true*/
-//var expect = require("chai").expect;
 var Extend = require('ecma5-extend');
 
 var common = require("./common.js");
@@ -29,16 +27,16 @@ describe('array.js', function() {
         Type = Extend.createType(definition);
         common.typeTester(Type, "SimpleClass");
     });
-    
+
     it('create an instance', function() {
         this.obj = Type.create();
     });
-    
+
     it('publish/subscribe', function() {
         expect(this.obj.publish).to.be.a("function");
         expect(this.obj.subscribe).to.be.a("function");
         expect(this.obj.unsubscribe).to.be.a("function");
-        
+
         common.notifyPublicPropertyTester(this.obj, "a");
     });
 

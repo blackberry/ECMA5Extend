@@ -37,7 +37,7 @@ module.exports = {
         }
 
         if (enumerable !== undefined) {
-            expect(obj.__proto__.propertyIsEnumerable(propName)).to.equal(enumerable);
+            expect(Object.getPrototypeOf(obj).propertyIsEnumerable(propName)).to.equal(enumerable);
         }
     },
     methodTester : function(obj, methodName, value) {
@@ -76,12 +76,12 @@ module.exports = {
         // TODO: figure out why this doesn't work with node.js
         //test.equal(obj.__proto__, undefined, moduleName + ": __proto__ destroyed");
     },
-    domTester : function(base) {
+    domTester : function(base, tagName) {
         var parentEl = document.createElement("div");
         expect(function() {
             parentEl.appendChild(base);
         }).not.throw();
         parentEl.removeChild(base);
-        expect(base.tagName).to.equal(base.constructor.tagName || "DIV");
+        expect(base.tagName).to.equal(tagName || "DIV");
     }
 };
