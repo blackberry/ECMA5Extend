@@ -1,0 +1,23 @@
+{
+    "plugins": [],
+    "opts": {
+        "template": "./node_modules/ink-docstrap/template",
+        "lenient": true,
+        "private": false
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "default": {
+            "outputSourceFiles": true
+        },
+        "systemName": "Documentation",
+        "footer": "",
+        "copyright": "BlackBerry Inc. Copyright © 2014",
+        "navType": "vertical",
+        "theme": "spacelab",
+        "linenums": true,
+        "collapseSymbols": false,
+        "inverseNav": false
+    }
+}

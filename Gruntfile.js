@@ -30,7 +30,8 @@ module.exports = function(grunt) {
     // load only required grunt tasks as tasks are run
     require('jit-grunt')(grunt, {
         jscs : 'grunt-jscs-checker',
-        mochacov : 'grunt-mocha-cov'
+        mochacov : 'grunt-mocha-cov',
+        mochaAppium : 'grunt-mocha-appium'
     });
 
     // configurable paths
@@ -63,30 +64,17 @@ module.exports = function(grunt) {
                 },
                 options : {
                     external : ['src/lib/ecma5-extend:ecma5-extend'],
-                    /*transform: ['node-underscorify'],*/
                     bundleOptions : {
                         debug : true // Embed source map for tests
                     },
-                    /*postBundleCB: function(err, src, cb) {
-                     var through = require('through');
-                     var stream = through().pause().queue(src).end();
-                     var buffer = '';
-                     stream.pipe(require('mold-source-map').transformSourcesRelativeTo(__dirname)).pipe(through(function(chunk) {
-                     buffer += chunk.toString();
-                     }, function() {
-                     cb(err, buffer);
-                     }));
-                     stream.resume();
-                     }*/
                 }
             }
         },
         jsdoc : {
-            src : ['src/**/*.js'],
+            src : ['src/**/*.js', './README.md'],
             options : {
                 destination : "docs",
-                private : false
-
+                configure : "jsdoc.conf.json"
             }
         },
         jscs : {
@@ -196,6 +184,31 @@ module.exports = function(grunt) {
                 /*singleRun: false,*/
             }
         },
+        mochaAppium : {
+            options : {
+                // Mocha options
+                reporter : 'spec',
+                timeout : 30e3,
+                // Toggles wd's promises API, default:false
+                usePromises : false,
+                // Path to appium executable, default:'appium'
+                appiumPath : 'appium'
+            },
+            android : {
+                src : ['test/*.js'],
+                options : {
+                    // Appium Options
+                    device : 'Android',
+                    platform : 'Linux',
+                    version : '4.2',
+                    // A url of a zip file containg your .app package
+                    // or
+                    // A local absolute path to your simulator-compiled .app directory
+                    // app : 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip'
+                }
+            }
+        },
+
         githooks : {
             all : {
                 // Will run the jscs and jshint

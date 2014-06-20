@@ -1,455 +1,210 @@
-# ECMA5Extend
+# ecma5-extend #
 
-Toolkit for writing good JavaScript APIs for both Browser and NodeJS using ECMA5.
+Ecma5-extend is a javascript library that provides a generic class structure for javascript. In contrast to other solutions, ecma5-extend classes are written in pure javascript and it requires support for ECMA5.
 
-## Why?
+------------
 
-JavaScript was originally invented to do basic form validation and arithmetic, and is evolving into a full-blown language for writing client and server-side Apps.
+#### Requirements ###
 
-**As JavaScript evolves, so should the developers that use it.**
+* [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
 
-A mature programming language provides:
 
-- Inheritance
-- Public, private and protected API
-- Intelligent event system
+#### High-Level Features ###
 
-Some of these are coming in ECMA6, which may take years for browsers to implement, plus the syntax changes drastically.
-This is why, after many painful projects, we've developed ExtendJS. 
+* Public, protected and private scopes
+* Public and protected inheritance
+* ECMA5 shorthand syntax
 
-Unlike other "extend-like" projects, this one relies on Object creation and manipulation tools provided by ECMA5, including Object.create and Object.defineProperty. This project does not use the "new" keyword and instead relies on inheritance using ECMA5 Object.create(). Unlike others, ECMA5Extend also offers protected, which comes very handy in large projects.
+## Overview ##
 
-### Why inheritance?
+Ecma5-extend is a commonjs module for writing javascript types that behave like C++ classes. Ecma5-extend supports creating public, protected and private scopes on objects and includes a customizable publish/subscribe system. Ecma5-extend suports type inheritance for both JavaScript types and DOM Elements.
 
-Simple: Code Reuse.
+    var personType = {
 
-### Why private?
+        name: "Person",
 
-A good API exposes only a subset of guts to the outside. The rest reside "under the hood", away from the developer. These are private APIs. 
-Think of a thermostat, you don't have control over heat or cold directly. You set the temperature, and the thermostat decides which one to turn on, and for how long, based on the room temperature. Setting the temperature is your public API, while access to heat and cold directly are inside of the private API.
+        /* defaults to Object if not specified */
+        extends : Object,
 
-### Why protected?
-
-What if your child type wants to inherit a non-public method and/or re-implement it? That's called protected.
-
-## Structure and how to use
-
-ECMA5Extend allows developers to clearly define their type definition, that compile into a **type** that have the following public API:
-
-- ```create (params)``` create instance of type and pass params into type's init() method
-	- example: ```var instance = Type.create();```
-	
-Once an **instance** is created, it has the following public API:
-
-- ```destroy ()``` put destroy code specific to the type here
-- ```subscribe (eventName, listenerFunction)``` subscribe to an event
-	- For example, ```instance.subscribe("valueChanged", handleValueChanged);```
-- ```unsubscribe (eventName, listenerFunction)``` unsubscribe from an event
-	- For example, ```instance.unsubscribe("valueChanged", handleValueChanged);```
-- ```publish (eventName, value1, value2)``` publish an event on current instance
-	- The publish method, looks for any methods in the public, private and subscribers list that match the eventName and calls them with two arguments. Example: ```instance.publish("valueChanged", newValue, oldValue);```
-
-Look at the Intelligent Event/Notification System section for examples.
-
-ECMA5Extend comes in three flavors:
-
-1. Standalone Library
-2. NodeJS module
-3. RequireJS AMD Plugin (http://requirejs.org/)
-
-### **Standalone Library**
-
-``` javascript
-
-var parent = {
-	
-		name : "parentType",
-		
-		public : { },
-
-		private : { },
-		
-		protected : { },
-		
-		init : function(){ },
-		
-		destroy : function(){ }
-
-	};
-
-var child = {
-	
-		name : "childType",
-		
-		public : { },
-
-		private : { },
-		
-		protected : { },
-		
-		init : function(){ },
-		
-		destroy : function(){ }
-
-	};
-	
-```
-
-In standalone mode, a global variablt ECMA5Extend has a single method:
-
-- ```createType (definition, extends)```
-	- where _definition_ is the type definition
-	- _extends_ is the parent type to inherit from
-
-```
-//Example: create parent and child types
-var parentType = ECMA5Extend.createType(parent);
-var childType = ECMA5Extend.createType(child, parent);
-```
-
-A type has the following methods:
-
-```
-//create instances
-var parentInstance = parentType.create();
-var childInstance = childType.create();
-```
-
-Anything you pass into create, gets passed into the type's init() functions as arguments.
-
-### **NodeJS module (commonJS)**
-
-NodeJS module is exactly the same as the standalone version, except using module.exports
-
-``` javascript
-var ECMA5Extend = require("./ECMA5Extend.js"),
-	Parent = require("./ParentType.js"),
-	Child = require("./ChildType.js");
-
-var ParentType = ECMA5Extend.createType(Parent);
-var ChildType = ECMA5Extend.createType(Child, Parent);
-
-var parentInstance = ParentType.create();
-var childInstance = ChildType.create();
-```
-
-### **RequireJS Plugin (http://requirejs.org/)**
-
-To use ECMA5Extend as a RequireJS plugin. You need to:
-
-1. Wrap the module in a define()
-2. Import parent Types using the extend! plugin, ```define([extend!parent], function(parentType){ })```
-3. Add an "extend" property that points at what was returned from the extend! plugin
-4. Return the type definition, as with any RequireJS modules
-
-```
-//parent class
-define("parent", function() {
-
-	return {
-	
-		name : "parentType",
-		
-		extend : null, //parent Type
-
-		public : { },
-
-		private : { },
-		
-		protected : { },
-		
-		init : function(){ },
-		
-		destroy : function(){ }
-
-	};
-
-});
-
-//child class
-define(["ECMA5Extend!parent"], function(parent) {
-
-	return {
-	
-		name : "childType"
-		
-		extend : parent, //this points at what extend!parent passes into this module
-
-		public : { },
-
-		private : { },
-		
-		protected : { },
-		
-		init : function(){ },
-		
-		destroy : function(){ }
-
-	};
-
-});
-```
-
-The result type will have a ```create()``` method, that creates instances.
-
-```
-require(["ECMA5Extend!child"], function(childType) {
-
-	var newInstance = childType.create();
-
-});
-```
-
-## Access to private, public, protected spaces
-
-Access is simple. From anywhere within your type (eg. the init function), use:
-
-``` javascript
-public : {
-
-	text: null,
-	publicMethod : function(){};
-},
-
-private : {
-
-	waveHello : function(){};
-
-},
-
-protected : {
-
-	draw: function(){};
-},
-
-init : function(){
-		
-	// define instance-specific private property
-	this.text = "hi there, I just secretly set the value of text :)";
-	
-	// access to private method
-	this.waveHello();
-	
-	// access to public API (will trigger textChanged event)
-	this.public.text = "hi there!";
-	
-	// call public method
-	this.public.publicMethod(); 	
-
-	//access to protected, will call the parent type's draw if draw isn't reimplemented by the child (self) type
-	this.protected.draw(); 
-
-}
-```
-
-Everything in the type is scoped so ```this``` points at the private of the instance. Whether from getters/setters, public/private/protected methods, ```this``` **always** points at private, so the following work:
-
-- ```this.*``` (access private space)
-- ```this.public.*``` (access public space)
-- ```this.protected.*``` (access protected space)
-
-To the outside world, only ```this.public.*``` is accessible, allowing developers to create clean APIs.
-
-## Intelligent Event/Notification System
-
-ECMA5Extend has an intelligent event system. Any property created in the "public" space, automatically gets setters and getters so that :
-
-- Setting the public property to a specific value triggers an "<propertyName>Changed" event. All subscribers, and any "<propertyName>Changed" methods inside private and public get notified of the change.
-- Setting the private property to a specific value allows you to go behind the property's back if you don't want to alarm the subscribers.
-- Developers can manually publish events using the ```instance.publish()``` method
-
-Example:
-
-
-``` javascript
-
-	var someType = {
-
-		public : {
-			
-			value : null,
-			
-			quietlySetValue : function(value) {				
-				//call the private function to update value behind the event's back
-				console.log("shhh.. I just went behind the propertys back, without triggering valueChanged!!");
-				this.value = value;
-			}
-			
-		},
-
-		private : {
-			
-			// this is triggered anytime "value" is set using the public API
-			valueChanged : function(newValue){
-				console.log("value changed to " + newValue);
-			}
-			
-		},
-...
-```
-
-Let's play:
-
-``` javascript
-var newType = someType.create();
-newType.value = "hi!";
-> "value changed to hi!"
-
-newType.value = "hello";
-> "value changed to hello!"
-
-newType.quietlySetValue("shhh...");
-> "shhh.. I just went behind the property's back, without triggering valueChanged!!"
-newType.value;
-> "shhh..."
-
-// Let's add a subscriber
-newType.subscribe("valueChanged", function(newValue){
-	console.log("subscriber has been notified of change to " + newValue);
-});
-
-// we now get two notifications
-newType.value = "hi!";
-> "value changed to hi!"
-> "subscriber has been notified of change to hi!"
-
-
-```
-
-## Using ECMA5 descriptors to define properties
-
-One of the amazing parts of ECMA5Extend is that developers are able to define properties using property descriptors. This not only allows to define read-only and write-only properties, but also provide limits on changes among other features.
-
-
-``` javascript
-
-	var someType = {
-
-		public : {
-			
-			value : {
-				get: function(){
-					return this.value;				
-				},
-				set: function(newValue){
-					//this provides granular control over what the values are set to
-					if (newValue < 0 || newValue > 100){
-						throw new Error("out of bounds exception for value");
-					}
-					else{
-						//set value
-						this.value = newValue;
-						//publish change event on type
-						this.public.publish("valueChanged", newValue);
-					}					
-				}
-			},
-			
-			someReadOnlyProperty: {
-				//omit the "set" function for the property to be read-only
-				get: function(){
-					return this.someReadOnlyProperty;
-				}			
-			}
-			
-		}
-
-...
-```
-
-This also allows you to directly access other variables in the getter and setter, for example, let's design a TextField type, which is essentially an input box:
-
-```
-var definition = {
-   public: {
-      value: {
-         get: function(){
-            return this.public.el.value; //direct access to DOM
-         },
-         set: function(newValue){
-            if (validate(newValue)){ //this allows for smart validation and setting limits
-                this.public.el.value = newValue;
-                // this also requires to publish a change event manually
-                this.public.publish("textChanged", newValue);
+        public: {
+            firstName: {
+                /* read/write value property */
+                value : "Isaac"
+            },
+            lastName: {
+                /* read/write accessor/mutator property */
+                set: function(firstName) {
+                    this.lastName = lastName;
+                }
+            },
+            fullName: {
+                /* read-only accessor property */
+                get: function() {
+                    return this.concatinateName();
+                }
             }
-         }
-      }
-   },
+        },
 
-   init : function(){
-      this.public.el = document.createElement("input");
-      this.public.el.setAttribute("type","text");
-      //subscribe to changes to DOM, so that we publish a changedEvent
-      var _self = this;
-      this.public.el.addEventListener("change", function(){
-         //publish the value retrieved using getter defined above, as to not duplicate data
-         _self.public.publish("valueChanged", _self.public.value); 
-      }
-   }
-...
-```
+        private: {
+            concatinateName: function() {
+                return this.firstName + ' ' + this.lastName;
+            }
+        },
 
-## Re-implementing parent methods using protected
+        init: function(first, last) {
+            this.firstName = first;
+            this.lastName = last;
+        }
+    }
 
-ECMA5Extend allows developers to declare protected methods. Protected methods allow child types to inherit non-public methods from their parents, and re-impliment parents' protected methods.
+    var person = Type.create('Frank', 'Jones');
+    console.log(person.fullName); // Frank Jones
+    person.firstName = "John";
+    console.log(person.fullName); // John Jones
 
-``` javascript
-var CatDescriptor = {
-	name : "Cat",
-	public : {
-		makesNoise : function() {
-			return this.protected.meows();
-		}
-	},
-	protected : {
-		meows : function() {
-			return true;
-		}
-	},
-};
+## Object Implementation ##
 
-var MuteCatDescriptor = {
-	name : "MuteCat",
-	//re-implement Cat's meows to return false
-	protected : {
-		meows : function() {
-			return false;
-		}
-	},
-};
-
-var Cat = ECMA5Extend.createType(CatDescriptor);
-var MuteCat = ECMA5Extend.createType(MuteCatDescriptor, CatDescriptor);
-
-console.log(MuteCat.create().makesNoise()); //returns false
-```
+To support private, protected and public scopes, ecma5-extend creates instance-specific objects for public and protected scopes and an instance-specific object for each ecma5-extend type in the type hierarchy.
 
 
-## Tests
+#### Structure ####
 
-Install jasmine-node
+The structure of an ecma5-extend object is functionally equivalent to the following pseudo-code:
 
-```
-npm install -g jasmine-node
-```
+    var publicObject = {
+        __proto__ : /* public scope definition */
+    };
+    var protectedObject = {
+        __proto__ : /* protected scope definition */
+    };
+    var privateObject = {
+        "public" : publicObject,
+        "protected" : protectedObject,
+        __proto__ : /* private scope definition */
+    };
 
-Run tests:
+**All functions are called with `this` as the private object.**
 
-```
-jasmine-node --runWithRequireJs .\tests
-```
+Unless otherwise implemented, **all properties are stored on the private object.** This means that within methods on the private scope, properties and methods in protected and public scopes must be accessed via the scope name, i.e: `this.public.myMethod()`
 
-If jasmine returns nothing, add --captureExceptions flag
 
-```
-jasmine-node --runWithRequireJs --captureExceptions .\tests
-```
+## Type Definition Syntax ##
 
-## Authors 
+Types are defined in a custom object format that uses ECMA5 style scope definitions as well as several short-forms. All parameters are optional.
 
-* Anzor Bashkhaz (https://github.com/anzorb)
-* Isaac Gordezky (https://github.com/igordezky)
+    var typeDefinition = {
+        name : "mycustomtype",
+        extends : Object,
+        private : {
+            /* private scope definition */
+        },
+        protected : {
+            /* protected scope definition */
+        },
+        public : {
+            /* public scope definition */
+        },
+        init : function() {
+        },
+        destroy : fuction() {
+        }
+    }
 
-## Disclaimer
+* **name** - the type name (will be shown in devtools)
+* **extends** - (optional) the type to inherit from (defaults to Object). Ecma5-extend types, javascript types and DOM Element types are supported
+* **private** - the private scope definition
+* **protected** - the protected scope definition
+* **public** - the public scope definition
+* **init** - called during object creation (after parent classes and before child classes)
+* **destroy** - called during object destruction (before parent classes and after child classes)
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Scope Definition Syntax ##
+
+Scope definitions are used to declare properties and methods in ECMA5 property descriptor syntax, tradtional object syntax and custom short forms. For the latter cases, ecma5-extend will create and auto-fill an ECMA5 property descriptor.
+
+
+#### ECMA5 Property Descriptor Syntax ###
+
+ECMA5 properties are defined using the ECMA5 property descriptor syntax. ECMA5 supports both value and accessor/mutator properties.
+
+* **configurable** - true if the property can be re-defined
+* **writable** - true if the property can be changed using `object.property = value`
+* **enumerbale** - true if the property is iterated by `for ... in` loops
+
+
+##### Value Properties #####
+
+* **value** - the initial value of the property
+
+
+##### Accessor / Mutator Properties #####
+
+* **get** - function which returns the current value of the property
+* **set** - function which sets the value of the property
+
+[See MDN for more information](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#Description)
+
+
+#### Short Forms and Default Values ####
+
+Ecma5-extend includes a parser that converts the traditional and shorthand forms to ECMA5 property descriptor, which sets default values according to the following rules:
+
+* functions are read-only and not enumerable
+* objects are writable and enumerable
+* when only a set function is defined, a get function that returns `<private object>.<propertyname>` is assumed.
+Note: *implied get is faster than writing your own, so it use where possible*
+
+For traditional syntax, ecma5-extend assumes default values for the property descriptor. An example of traditional syntax is shown here:
+
+    var publicDefinition = {
+        myproperty : "myvalue",
+        mymethod : function () {}
+    };
+
+
+## Eventing ##
+
+Ecma5-extend provides a default implementation for an eventing system, with the following api
+
+* *public* **publish (event, ...)** - emit an event (supports multiple parameters)
+* *public* **subscribe (event, callback)** - subscribe to an event
+* *public* **unsubscribe (event, callback)** - unsubscribe from an event
+
+
+### Automatic Change Events ###
+
+**Caution: this behaviour may change in the future**
+
+Ecma5-extend automatically publishes a *propertyChanged* event when a **public** property is changed.
+
+
+### Intercepting Events ###
+
+If a *protected* method named *propertynameChanged* is defined, it will be called before any subscribers. Currently there is no way to prohibit an event or modify its arguments, but that could be implemented with custom eventing.
+
+
+### Custom Eventing ###
+
+Ecma5-extend will automatically install its publish/subscribe system unless one is provided by the developer or inherited from a parent type. The ecma5-extend publish/subscribe system can be customized by implementing the following api in a type definition:
+
+* *protected* **publish (event, ...)** - emit an event (supports multiple parameters)
+* *public* **subscribe (event, callback)** - subscribe to an event
+* *public* **unsubscribe (event, callback)** - unsubscribe from an event
+
+
+## Object Creation / Destruction ##
+
+An object of a specific type can be created by calling the `create` method on the type, supplying any parameters to be passed to the type's init method.
+
+    var object = Type.create(arg1, arg2);
+
+Objects **must** be destroyed to have their memory reclaimed.
+
+    object.destroy();
+
+### DOM Objects ###
+
+When inheriting from DOM Element types, a *name* must be provided in the type definition. This name will be used to create the html tag name for your type.
+
+To turn an already-existing dom node into your type, pass the DOM node as the first parameter to `type.create`. Otherwise, it will be created automatically.

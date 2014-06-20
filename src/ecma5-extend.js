@@ -16,8 +16,11 @@
 */
 
 /**
- * ECMA5Extend client-side module
- * @module ECMA5Extend
+ * Ecma5-extend is a javascript library that provides a generic class
+ * structure for javascript. In contrast to other solutions, ecma5-extend
+ * classes are written in pure javascript and it requires support for ECMA5.
+ *
+ * @module ecma5-extend
  */
 
 var NOTIFY_ALL = true;
@@ -541,10 +544,33 @@ var isType = function isType(type) {
 };
 
 /**
- * build a type from a compiled type definition
+ * <p>Build a type from a compiled type definition</p>
+ * <p>Type definitions have a custom object format that uses ECMA5 style scope definitions
+ * as well as several short-forms (all parameters are optional)</p>
+ *
  * @static
- * @param {Object} definition - extend class definition created by the extend compiler
- * @returns {Type}
+ * @param {object} type definition - extend class definition created by the extend compiler
+ * @returns {type}
+ *
+ * @example
+ *
+ * ecma5_extend.createType({
+ *     name : "mycustomtype",
+ *     extends : Object,
+ *     private : {
+ *         // private scope definition
+ *     },
+ *     protected : {
+ *         // protected scope definition
+ *     },
+ *     public : {
+ *         // public scope definition
+ *     },
+ *     init : function() {
+ *     },
+ *     destroy : fuction() {
+ *     }
+ * });
  */
 var createType = function(definition) {
     if (definition.__id) {
