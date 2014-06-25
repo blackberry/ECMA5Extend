@@ -27,18 +27,18 @@ Ecma5-extend is a commonjs module for writing javascript types that behave like 
         extends : Object,
 
         public: {
-            firstName: {
-                /* read/write value property */
-                value : "Isaac"
-            },
+            /* read/write value property with default value */
+            firstName: "Isaac",
+
+            /* read/write accessor/mutator property (implied getter) */
             lastName: {
-                /* read/write accessor/mutator property */
                 set: function(firstName) {
                     this.lastName = lastName;
                 }
             },
+
+            /* read-only accessor property */
             fullName: {
-                /* read-only accessor property */
                 get: function() {
                     return this.concatinateName();
                 }
@@ -69,6 +69,11 @@ To support private, protected and public scopes, ecma5-extend creates instance-s
 
 #### Structure ####
 
+An ecma5-extend object is composed of at least three instance-specific objects: one public, one protected, and one private for each ecma5-extend type in the type hierarchy.
+* **public object** - the 'instance' object that you get from Type.create(), this is the public api
+* **protected object** - an object shared between all the types in the type hierarcy, but invisible to the public api
+* **private object** - a type specific object that is not visible outside the type
+
 The structure of an ecma5-extend object is functionally equivalent to the following pseudo-code:
 
     var publicObject = {
@@ -83,6 +88,8 @@ The structure of an ecma5-extend object is functionally equivalent to the follow
         __proto__ : /* private scope definition */
     };
 
+#### Implied Private Scope ####
+
 **All functions are called with `this` as the private object.**
 
 Unless otherwise implemented, **all properties are stored on the private object.** This means that within methods on the private scope, properties and methods in protected and public scopes must be accessed via the scope name, i.e: `this.public.myMethod()`
@@ -95,6 +102,7 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
     var typeDefinition = {
         name : "mycustomtype",
         extends : Object,
+        mixins : [/* list of types to mix in */],
         private : {
             /* private scope definition */
         },
@@ -112,6 +120,7 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
 
 * **name** - the type name (will be shown in devtools)
 * **extends** - (optional) the type to inherit from (defaults to Object). Ecma5-extend types, javascript types and DOM Element types are supported
+* **mixins** - (optional) a list of types to mix into this type
 * **private** - the private scope definition
 * **protected** - the protected scope definition
 * **public** - the public scope definition
@@ -153,7 +162,8 @@ Ecma5-extend includes a parser that converts the traditional and shorthand forms
 * functions are read-only and not enumerable
 * objects are writable and enumerable
 * when only a set function is defined, a get function that returns `<private object>.<propertyname>` is assumed.
-Note: *implied get is faster than writing your own, so it use where possible*
+
+**Note: *implied getters and setters are faster than writing your own, so it use them wherever possible***
 
 For traditional syntax, ecma5-extend assumes default values for the property descriptor. An example of traditional syntax is shown here:
 
