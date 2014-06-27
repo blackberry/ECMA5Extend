@@ -53,11 +53,6 @@ module.exports = function(grunt) {
                 /*watch : true,
                  keepAlive : true*/
             },
-            dist : {
-                files : {
-                    "tmp/compiled.js" : ["test/browser.js"]
-                }
-            },
             tests : {
                 files : {
                     'test/browserified_mocha_unit_tests.js' : 'test/spec/**.js',
@@ -113,7 +108,7 @@ module.exports = function(grunt) {
 
         connect : {
             options : {
-                port : 9002,
+                port : 9020,
                 // change this to '0.0.0.0' to access the server from outside
                 hostname : '0.0.0.0'
             },
@@ -251,7 +246,6 @@ module.exports = function(grunt) {
     // plugin's task(s), then test the result.
     grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity']);
     grunt.registerTask('validate:ci', ['jscs', 'jshint:ci', 'complexity']);
-    grunt.registerTask('browser-test', ['browserify:dist']);
     grunt.registerTask('docs', ['jsdoc']);
 
     grunt.registerTask('tdd', ['browserify:tests', 'connect:tdd', 'open:unit', 'watch:tdd']);

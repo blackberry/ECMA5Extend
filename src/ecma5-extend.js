@@ -21,6 +21,12 @@
  * classes are written in pure javascript and it requires support for ECMA5.
  *
  * @module ecma5-extend
+ *
+ * @property {boolean} memoryLeakWarning - Enables memory leak warnings for ecma5-extend classes. (Default: true)
+ *
+ * @property {boolean} memoryLeakProtection - Enables memory leak protection for ecma5-extend classes.
+ * Memory leak protection automatically deletes properties on the private and protected objects during destroy. (Default: false)
+ *
  */
 
 var NOTIFY_ALL = true;
@@ -28,7 +34,10 @@ var NOTIFY_ALL = true;
 var objectCount = 1;
 var definitionCount = 1;
 
-var exports = {};
+var exports = {
+    memoryLeakWarnings : true,
+    memoryLeakProtector : false
+};
 var typeRegistry = {};
 
 // TODO: add test for this
@@ -95,6 +104,9 @@ var defineSubscribe = function(privateRegistry) {
 var defineUnsubscribe = function(privateRegistry) {
     return function(eventName, listener, id) {
         var priv = privateRegistry[this.__id];
+        if (!priv.__subscribers__) {
+            return;
+        }
         var eventGroup = priv.__subscribers__[eventName];
         if (eventGroup) {
             for (var i = 0; i < eventGroup.length; i++) {
@@ -220,6 +232,24 @@ var defineInit = function(privateRegistry, init, _super, name, mixins) {
     };
 };
 
+var destroyObjectProperties = function(priv, type) {
+    if (exports.memoryLeakWarnings || exports.memoryLeakProtector) {
+        Object.getOwnPropertyNames(priv).forEach(function(key) {
+            var value = priv[key];
+            if (value && typeof value === "object") {
+                if (exports.memoryLeakWarnings) {
+                    console.warn("ecma5-extend.memoryLeakWarning %s.%s = %s", type.name, key, value.tagName ? "<" + value.tagName.toLowerCase() + ">" : value);
+                }
+                if (exports.memoryLeakProtector) {
+                    Object.defineProperty(priv, key, {
+                        value : undefined
+                    });
+                }
+            }
+        }, this);
+    }
+};
+
 var defineDestroy = function(privateRegistry, destroy, _super, _public) {
     return function callDestroy() {
         var priv = privateRegistry[this.__id];
@@ -241,13 +271,7 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
                     value : undefined
                 }
             });
-
-            Object.getOwnPropertyNames(priv.protected).forEach(function(key) {
-                Object.defineProperty(priv.protected, key, {
-                    value : undefined
-                });
-            });
-
+            destroyObjectProperties(priv.protected, _public);
             Object.setPrototypeOf(priv.protected, Object.prototype);
 
             Object.defineProperties(priv.public, {
@@ -273,13 +297,12 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
             },
             "public" : {
                 value : undefined
+            },
+            "__subscribers__" : {
+                value : undefined
             }
         });
-        Object.getOwnPropertyNames(priv).forEach(function(key) {
-            Object.defineProperty(priv, key, {
-                value : undefined
-            });
-        });
+        destroyObjectProperties(priv, _public.constructor);
         Object.setPrototypeOf(priv, Object.prototype);
         delete privateRegistry[this.__id];
     };
