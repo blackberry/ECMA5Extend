@@ -41,6 +41,7 @@
     "grunt-jsdoc": "^0.5.4",
     "grunt-karma": "^0.8.2",
     "grunt-mocha-appium": "^0.3.0",
+    "grunt-nsp-package": "0.0.4",
     "grunt-open": "^0.2.3",
     "ink-docstrap": "^0.4.5",
     "jit-grunt": "^0.4.1",
@@ -62,6 +63,8 @@
     "source-map": "^0.1.33",
     "through": "^2.3.4",
     "time-grunt": "^0.3.1"
+  },
+  "dependencies": {
   },
   "keywords": [
     "gruntplugin",

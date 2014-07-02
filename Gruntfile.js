@@ -31,7 +31,8 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {
         jscs : 'grunt-jscs-checker',
         mochacov : 'grunt-mocha-cov',
-        mochaAppium : 'grunt-mocha-appium'
+        mochaAppium : 'grunt-mocha-appium',
+        'validate-package' : 'grunt-nsp-package'
     });
 
     // configurable paths
@@ -244,7 +245,7 @@ module.exports = function(grunt) {
 
     // Whenever the "test" task is run, first clean the "tmp" dir, then run this
     // plugin's task(s), then test the result.
-    grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity']);
+    grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity', 'validate-package']);
     grunt.registerTask('validate:ci', ['jscs', 'jshint:ci', 'complexity']);
     grunt.registerTask('docs', ['jsdoc']);
 
