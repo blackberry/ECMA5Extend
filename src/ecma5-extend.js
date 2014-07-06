@@ -29,6 +29,73 @@
  *
  */
 
+/**
+ * The common interface shared by every ecma5-extend type.
+ *
+ * @class Type
+ * @memberof ecma5-extend
+ */
+
+/**
+ * @function create
+ * @memberof ecma5-extend.Type#
+ * @returns {ecma5-extend.Object} A new ecma5-extend object
+ */
+
+/**
+ * The common interface shared by every object that is an instance of an ecma5-extend type.
+ *
+ * Due to the limitations of javascript types, a single ecma5-extend instance has three associated objects:
+ *
+ *  * {@link ecma5-extend.Object.PublicInterface PublicInterface}
+ *      An object that is the public interface of an ecma5-extend instance
+ *  * {@link ecma5-extend.Object.ProtectedInterface ProtectedInterface}
+ *      An object that is the protected interface of an ecma5-extend instance, shared between all ecma5-extend types in an instance's type hierarchy
+ *  * {@link ecma5-extend.Object.PrivateInterface PrivateInterface}
+ *      An object that is the private interface of an ecma5-extend instance, specific to each ecma5-extend type in an instance's type hierarchy
+ *
+ *
+ * @class Object
+ * @memberof ecma5-extend
+ *
+ */
+
+/**
+ * Callback for ecma5-extend events.
+ * @callback EventCallback
+ * @memberof ecma5-extend.Object
+ * @param {ecma5-extend.Object.PublicInterface} object - The object from which the event was emitted
+ * @param {*} value - The value associated with the event
+ * @param {*} [oldvalue] - The old value associated with the event
+ */
+
+/**
+ * The public interface of an ecma5-extend object
+ *
+ * @class PublicInterface
+ * @memberof ecma5-extend.Object
+ */
+
+/**
+ * The protected interface of an ecma5-extend object
+ *
+ * @class ProtectedInterface
+ * @memberof ecma5-extend.Object
+ *
+ * @property {ecma5-extend.Object.PublicInterface} public The public interface of this object
+ *
+ */
+
+/**
+ * The private interface of an ecma5-extend object.
+ *
+ * @class PrivateInterface
+ * @memberof ecma5-extend.Object
+ *
+ * @property {ecma5-extend.Object.PublicInterface} public The public interface of this ecma5-extend object
+ * @property {ecma5-extend.Object.ProtectedInterface} protected The protected interface of this ecma5-extend object
+ */
+
 var NOTIFY_ALL = true;
 
 var objectCount = 1;
@@ -62,7 +129,20 @@ if ( typeof Object.setPrototypeOf === "undefined") {
     });
 }
 
-/* per-type functions go here */
+/************************* per-type functions go here ************************/
+/**
+ * Access the super-class implementation of functions via `super.protected` and `super.public`.
+ * Each function calls the super-class implementation of `methodname` within the respective scope.
+ *
+ * @member {Object} super
+ * @memberof ecma5-extend.Object.PrivateInterface#
+ *
+ * @property {function} public(methodname,...) Calls the super-class pubilc implementation of `methodname`
+ * *Throws **`TypeError`** if a public super method `methodname` does not exist*
+ * @property {function} protected(methodname,...) Calls the super-class protected implementation of `methodname`
+ * *Throws **`TypeError`** if a protected super method `methodname` does not exist*
+ */
+
 var getPublicSuper = function getPublicSuper(methodName) {
     var _this = this.object;
     var _super = _this.public[methodName].__super__;
@@ -81,12 +161,29 @@ var getProtectedSuper = function getProtectedSuper(methodName) {
     return _super.apply(_this.public, Array.prototype.slice.call(arguments, 1));
 };
 
-var getPrivate = function getPrivate(obj) {
-    return Object.getPrototypeOf(this).privateRegistry[obj.__id];
+/**
+ * Returns the private object from a public instance of that object.
+ *
+ * @memberof ecma5-extend.Object.PrivateInterface#
+ *
+ * @param {ecma5-extend.Object.PublicInterface} object - An object of this type
+ * @returns {ecma5-extend.Object.PrivateInterface} The private object
+ */
+var getPrivate = function getPrivate(object) {
+    return Object.getPrototypeOf(this).privateRegistry[object.__id];
 };
 
 var defineSubscribe = function(privateRegistry) {
-    return function(eventName, callback, id) {
+    /**
+     * Subscribe to an event with a callback (Overridable)
+     *
+     * @public
+     * @memberof ecma5-extend.Object.PublicInterface#
+     *
+     * @param {string} eventName - The event name
+     * @param {ecma5-extend.Object.EventCallback} callback - The callback to bind to the event.
+     */
+    return function subscribe(eventName, callback, id) {
         var priv = privateRegistry[this.__id];
         if (!priv.__subscribers__) {
             priv.__subscribers__ = {};
@@ -102,7 +199,16 @@ var defineSubscribe = function(privateRegistry) {
 };
 
 var defineUnsubscribe = function(privateRegistry) {
-    return function(eventName, listener, id) {
+    /**
+     * Unsubscribe to an event with a callback (Overridable)
+     *
+     * @public
+     * @memberof ecma5-extend.Object.PublicInterface#
+     *
+     * @param {string} eventName - The event name
+     * @param {ecma5-extend.Object.EventCallback} - The callback to unbind from the event.
+     */
+    return function unsubscribe(eventName, callback, id) {
         var priv = privateRegistry[this.__id];
         if (!priv.__subscribers__) {
             return;
@@ -114,7 +220,7 @@ var defineUnsubscribe = function(privateRegistry) {
                 if (id && singleEvent.id && singleEvent.id === id) {
                     eventGroup.splice(i, 1);
                     i -= 1;
-                } else if (listener && singleEvent.fn && singleEvent.fn === listener) {
+                } else if (callback && singleEvent.fn && singleEvent.fn === callback) {
                     eventGroup.splice(i, 1);
                     i -= 1;
                 }
@@ -124,10 +230,29 @@ var defineUnsubscribe = function(privateRegistry) {
 };
 
 var definePublish = function(privateRegistry) {
-    return function(eventName, newValue, oldValue) {
+    /**
+     * Publish implementation called by {@link ecma5-extend.Object.PublicInterface#publish PublicInterface.publish} (Overridable)
+     *
+     * ##### Behavior #####
+     * Before publishing an event, this function will look for a protected-interface method
+     * with the same name as the event and call it with newValue and oldValue.
+     * If this method returns true, **the event will be cancelled**.
+     *
+     * @memberof ecma5-extend.Object.ProtectedInterface#
+     *
+     * @param {string} eventName - The name of the event
+     * @param {*} value - The new value associated with the event
+     * @param {*} [oldvalue] - The old value associated with the event
+     * @returns {boolean} If the event was cancelled
+     */
+
+    return function publish(eventName, newValue, oldValue) {
         var priv = privateRegistry[this.public.__id];
         if ( typeof priv.protected[eventName] === "function") {
-            priv.protected[eventName](newValue, oldValue);
+            var cancel = priv.protected[eventName](newValue, oldValue);
+            if (cancel) {
+                return true;
+            }
         }
         if (priv.__subscribers__ && priv.__subscribers__[eventName]) {
             var listeners = priv.__subscribers__[eventName].slice();
@@ -138,11 +263,22 @@ var definePublish = function(privateRegistry) {
                 }
             }
         }
+        return false;
     };
 };
 
 var definePublicPublish = function(privateRegistry) {
-    return function(eventName, newValue, oldValue) {
+    /**
+     * Publish an event on the object. For default behavior see {@link ecma5-extend.Object.ProtectedInterface#publish Object.publish}.
+     *
+     * @memberof ecma5-extend.Object.PublicInterface#
+     *
+     * @param {string} eventName - The name of the event
+     * @param {*} value - The new value associated with the event
+     * @param {*} [oldvalue] - The old value associated with the event
+     * @returns {boolean} If the event was cancelled
+     */
+    return function publish(eventName, newValue, oldValue) {
         var priv = privateRegistry[this.__id];
         return priv.protected.publish(eventName, newValue, oldValue);
     };
@@ -214,6 +350,11 @@ var defineSetProperty = function(privateRegistry, key) {
 };
 
 var defineInit = function(privateRegistry, init, _super, name, mixins) {
+    /**
+     * Initialize an elsa object (Overridable)
+     * @function initialize
+     * @memberof ecma5-extend.Object.ProtectedInterface#
+     */
     return function callInit() {
         //console.log(definition.name + ": callInit");
         if ( typeof _super === "function") {
@@ -250,7 +391,12 @@ var destroyObjectProperties = function(priv, type) {
     }
 };
 
-var defineDestroy = function(privateRegistry, destroy, _super, _public) {
+var defineDestroy = function(privateRegistry, destroy, _super, publicPrototype) {
+    /**
+     * Destroy an elsa object (Overridable)
+     * @function destroy
+     * @memberof ecma5-extend.Object.ProtectedInterface#
+     */
     return function callDestroy() {
         var priv = privateRegistry[this.__id];
         if (!priv) {
@@ -265,13 +411,13 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
         }
 
         // we are is the 'final' type
-        if (Object.getPrototypeOf(this) === _public) {
+        if (Object.getPrototypeOf(this) === publicPrototype) {
             Object.defineProperties(priv.protected, {
                 "public" : {
                     value : undefined
                 }
             });
-            destroyObjectProperties(priv.protected, _public);
+            destroyObjectProperties(priv.protected, publicPrototype);
             Object.setPrototypeOf(priv.protected, Object.prototype);
 
             Object.defineProperties(priv.public, {
@@ -302,7 +448,7 @@ var defineDestroy = function(privateRegistry, destroy, _super, _public) {
                 value : undefined
             }
         });
-        destroyObjectProperties(priv, _public.constructor);
+        destroyObjectProperties(priv, publicPrototype.constructor);
         Object.setPrototypeOf(priv, Object.prototype);
         delete privateRegistry[this.__id];
     };
@@ -358,13 +504,16 @@ var extendPrivateScope = function(definition, privateDefn) {
             };
         }
     });
+
     var _super = {};
     Object.defineProperties(_super, {
         "public" : {
-            value : getPublicSuper
+            value : getPublicSuper,
+            writable : false
         },
         "protected" : {
-            value : getProtectedSuper
+            value : getProtectedSuper,
+            writable : false
         }
     });
     privateDefn["super"] = {
@@ -552,9 +701,127 @@ var isHTMLType = function(object) {
     return (object.prototype instanceof window.Node || object instanceof window.Node);
 };
 
+var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, protectedPrototype, privatePrototype) {
+    var self = desc.self;
+    return {
+        create : {
+            /**
+             * Create an instance of this type.
+             * @name create
+             * @memberof ecma5-extend.Type#
+             */
+            value : function() {
+                var args = Array.prototype.slice.apply(arguments);
+                var iPublic;
+
+                if (this === self) {
+                    var __id = objectCount++;
+                    if (isHTMLType(args[0]) && isHTMLType(publicPrototype)) {
+                        iPublic = args[0];
+                        args = args.slice(1);
+                        if (Object.getPrototypeOf(iPublic) !== publicPrototype) {
+                            Object.setPrototypeOf(iPublic, publicPrototype);
+                        }
+                    } else if (this.tagName !== undefined) {
+                        iPublic = document.createElement(this.tagName);
+                        Object.setPrototypeOf(iPublic, publicPrototype);
+                    } else {
+                        iPublic = Object.create(publicPrototype);
+                    }
+                    Object.defineProperty(iPublic, "__id", {
+                        configurable : true,
+                        writable : false,
+                        enumerable : false,
+                        value : __id
+                    });
+
+                    var iProtected = Object.create(protectedPrototype, {
+                        "public" : {
+                            enumerable : true,
+                            writable : badDefineProperty,
+                            configurable : true,
+                            value : iPublic
+                        },
+                        "__id" : {
+                            configurable : true,
+                            writable : false,
+                            enumerable : false,
+                            value : __id
+                        }
+                    });
+
+                    var instance = self.create.apply(iProtected, args);
+                    iProtected.init.apply(iProtected, args);
+                    return instance;
+                } else {
+                    /* chain to base clase: this === iProtected */
+                    if (desc.baseType && typeof desc.baseType.extend === "function") {
+                        desc.baseType.create.apply(this, args);
+                    }
+
+                    var iPrivate = Object.create(privatePrototype, {
+                        "protected" : {
+                            enumerable : true,
+                            writable : badDefineProperty,
+                            configurable : true,
+                            value : this
+                        },
+                        "public" : {
+                            enumerable : true,
+                            writable : badDefineProperty,
+                            configurable : true,
+                            value : this.public
+                        }
+                    });
+
+                    desc.privateRegistry[this.public.__id] = iPrivate;
+                    return this.public;
+                }
+            }
+        },
+        extend : {
+            value : function(properties) {
+                return Object.create(protectedPrototype, properties || {});
+            }
+        },
+        "prototype" : {
+            enumerable : true,
+            writable : false,
+            configurable : false,
+            value : publicPrototype
+        },
+        constructor : {
+            configurable : false,
+            writable : false,
+            enumerable : false,
+            value : Object.create({}, {
+                "name" : {
+                    configurable : false,
+                    writable : false,
+                    enumerable : false,
+                    value : "Type<" + desc.name + ">"
+                }
+            })
+        },
+        /**
+         * The name of this type
+         * @constant {string} name
+         * @memberof ecma5-extend.Type#
+         */
+        "name" : {
+            enumerable : true,
+            value : desc.name
+        },
+        /*"__definition__" : {
+         value : definition
+         }*/
+    };
+};
+
 /**
  * check if an object is an ecma5-extend type
- * @static
+ *
+ * @instance
  * @param {Object} type - an object that may be an ecma5-extend type
  * @returns {Boolean}
  */
@@ -571,7 +838,7 @@ var isType = function isType(type) {
  * <p>Type definitions have a custom object format that uses ECMA5 style scope definitions
  * as well as several short-forms (all parameters are optional)</p>
  *
- * @static
+ * @instance
  * @param {object} type definition - extend class definition created by the extend compiler
  * @returns {type}
  *
@@ -599,188 +866,99 @@ var createType = function(definition) {
     if (definition.__id) {
         return typeRegistry[definition.__id];
     }
-    Object.defineProperty(definition, "__id", {
-        writable : false,
-        configurable : false,
-        enumerable : false,
-        value : definitionCount++
+    var privateRegistry = {};
+    Object.defineProperties(definition, {
+        "__id" : {
+            writable : false,
+            configurable : false,
+            enumerable : false,
+            value : definitionCount++
+        },
+        getPrivate : {
+            writable : false,
+            configurable : false,
+            enumerable : false,
+            value : function(object) {
+                if (!publicPrototype.isPrototypeOf(object)) {
+                    throw TypeError("object " + object.constructor.name + " is not of type " + publicPrototype.constructor.name);
+                }
+                return privateRegistry[object.__id];
+            }
+        }
     });
 
     var baseTypeDefinition = definition.extend;
 
-    var baseType = null, _type;
+    var baseType = null, self;
     var ultimateType = true;
     if (!baseTypeDefinition) {
-        _type = {};
+        self = {};
     } else if ( typeof baseTypeDefinition.create === "function" && baseTypeDefinition !== Object) {
         baseType = baseTypeDefinition;
-        _type = Object.create(baseType);
+        self = Object.create(baseType);
         ultimateType = false;
     } else if (isHTMLType(baseTypeDefinition)) {
         baseType = baseTypeDefinition;
-        _type = {};
+        self = {};
     } else if ( typeof baseTypeDefinition === "function") {
         baseType = baseTypeDefinition;
-        _type = {};
+        self = {};
     } else if ( typeof baseTypeDefinition === "string") {
         baseType = document.createElement(baseTypeDefinition).constructor;
-        _type = {};
-        _type.tagName = baseTypeDefinition.toUpperCase();
+        self = {};
+        self.tagName = baseTypeDefinition.toUpperCase();
     } else {
         // lets hope what you gave me is a valid baseType
         baseType = baseTypeDefinition;
-        _type = {};
+        self = {};
     }
     if (baseType && isHTMLType(baseType)) {
-        _type.tagName = "EL-" + definition.name.toUpperCase();
+        self.tagName = "EL-" + definition.name.toUpperCase();
     }
-    typeRegistry[definition.__id] = _type;
+    typeRegistry[definition.__id] = self;
 
-    var _private = {}, privateRegistry = {}, privateDefn = {};
-    Object.defineProperties(_private, {
+    var privatePrototype = {}, privateDefn = {};
+    Object.defineProperties(privatePrototype, {
         "privateRegistry" : {
             value : privateRegistry
         }
     });
-    var _protected = extendScope(definition, "protected", baseType, privateDefn, privateRegistry, ultimateType);
-    var _public = extendScope(definition, "public", baseType, privateDefn, privateRegistry, ultimateType);
+    var protectedPrototype = extendScope(definition, "protected", baseType, privateDefn, privateRegistry, ultimateType);
+    var publicPrototype = extendScope(definition, "public", baseType, privateDefn, privateRegistry, ultimateType);
 
     // public/protected extendScope MUST be before this ??
     extendPrivateScope(definition, privateDefn);
-    Object.defineProperties(_private, privateDefn);
+    Object.defineProperties(privatePrototype, privateDefn);
 
     // TODO: pull these out for scope save reduction
-    Object.defineProperties(_type, {
-        create : {
-            value : function() {
-                var args = Array.prototype.slice.apply(arguments);
-                var iPublic;
+    Object.defineProperties(self, defineTypeProperties({
+        self : self,
+        name : definition.name,
+        privateRegistry : privateRegistry,
+        baseType : baseType
+    }, publicPrototype, protectedPrototype, privatePrototype));
 
-                if (this === _type) {
-                    var __id = objectCount++;
-                    if (isHTMLType(args[0]) && isHTMLType(_public)) {
-                        iPublic = args[0];
-                        args = args.slice(1);
-                        if (Object.getPrototypeOf(iPublic) !== _public) {
-                            Object.setPrototypeOf(iPublic, _public);
-                        }
-                    } else if (this.tagName !== undefined) {
-                        iPublic = document.createElement(this.tagName);
-                        Object.setPrototypeOf(iPublic, _public);
-                    } else {
-                        iPublic = Object.create(_public);
-                    }
-                    Object.defineProperty(iPublic, "__id", {
-                        configurable : true,
-                        writable : false,
-                        enumerable : false,
-                        value : __id
-                    });
-
-                    var iProtected = Object.create(_protected, {
-                        "public" : {
-                            enumerable : true,
-                            writable : badDefineProperty,
-                            configurable : true,
-                            value : iPublic
-                        },
-                        "__id" : {
-                            configurable : true,
-                            writable : false,
-                            enumerable : false,
-                            value : __id
-                        }
-                    });
-
-                    var instance = _type.create.apply(iProtected, args);
-                    iProtected.init.apply(iProtected, args);
-                    return instance;
-                } else {
-                    /* chain to base clase: this === iProtected */
-                    if (baseType && typeof baseType.extend === "function") {
-                        baseType.create.apply(this, args);
-                    }
-
-                    var iPrivate = Object.create(_private, {
-                        "protected" : {
-                            enumerable : true,
-                            writable : badDefineProperty,
-                            configurable : true,
-                            value : this
-                        },
-                        "public" : {
-                            enumerable : true,
-                            writable : badDefineProperty,
-                            configurable : true,
-                            value : this.public
-                        }
-                    });
-
-                    privateRegistry[this.public.__id] = iPrivate;
-                    return this.public;
-                }
-            }
-        },
-        extend : {
-            value : function(properties) {
-                return Object.create(_protected, properties || {});
-            }
-        },
-        "prototype" : {
-            enumerable : true,
-            writable : false,
-            configurable : false,
-            value : _public
-        },
-        constructor : {
-            configurable : false,
-            writable : false,
-            enumerable : false,
-            value : Object.create({}, {
-                "name" : {
-                    configurable : false,
-                    writable : false,
-                    enumerable : false,
-                    value : "Type<" + definition.name + ">"
-                }
-            })
-        },
-        "name" : {
-            enumerable : true,
-            value : definition.name
-        },
-        "__definition__" : {
-            value : definition
-        }
-    });
-
-    Object.defineProperties(_public, {
+    Object.defineProperties(publicPrototype, {
         constructor : {
             configurable : true,
             writable : false,
             enumerable : false,
-            value : _type
+            value : self
         }
     });
 
-    _type.private = _private;
-    _type.protected = _protected;
+    // TODO : remove for release 1
+    self.private = privatePrototype;
+    self.protected = protectedPrototype;
 
-    return _type;
+    return self;
 };
 
 module.exports = exports;
 Object.defineProperties(module.exports, {
     createType : {
         enumerable : true,
-        value : function(child, parent) {
-            if (parent) {
-                child.extend = createType(parent);
-            }
-            //else
-            //child.extend = null;
-            return createType(child);
-        }
+        value : createType
     },
     isType : {
         enumerable : true,

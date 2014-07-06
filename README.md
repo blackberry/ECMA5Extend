@@ -26,6 +26,9 @@ Ecma5-extend is a commonjs module for writing javascript types that behave like 
         /* defaults to Object if not specified */
         extends : Object,
 
+        /* mixin other types or groups of functions */
+        mixins : [ executiveMixin ],
+
         public: {
             /* read/write value property with default value */
             firstName: "Isaac",
@@ -70,9 +73,9 @@ To support private, protected and public scopes, ecma5-extend creates instance-s
 #### Structure ####
 
 An ecma5-extend object is composed of at least three instance-specific objects: one public, one protected, and one private for each ecma5-extend type in the type hierarchy.
-* **public object** - the 'instance' object that you get from Type.create(), this is the public api
-* **protected object** - an object shared between all the types in the type hierarcy, but invisible to the public api
-* **private object** - a type specific object that is not visible outside the type
+* __`PublicInterface`__ - the 'instance' object that you get from Type.create(), this is the public api
+* __`ProtectedInterface`__ - an object shared between all the types in the type hierarcy, but invisible to the public api
+* __`PrivateInterface`__ - a type specific object that is not visible outside the type
 
 The structure of an ecma5-extend object is functionally equivalent to the following pseudo-code:
 
@@ -90,9 +93,9 @@ The structure of an ecma5-extend object is functionally equivalent to the follow
 
 #### Implied Private Scope ####
 
-**All functions are called with `this` as the private object.**
+**All functions are called with `this` as the `PrivateInterface`.**
 
-Unless otherwise implemented, **all properties are stored on the private object.** This means that within methods on the private scope, properties and methods in protected and public scopes must be accessed via the scope name, i.e: `this.public.myMethod()`
+Unless otherwise implemented, **all properties are stored on the `PrivateInterface`.** This means that within methods on the private scope, properties and methods in protected and public scopes must be accessed via the scope name, i.e: `this.public.myMethod()`
 
 
 ## Type Definition Syntax ##
@@ -118,14 +121,14 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
         }
     }
 
-* **name** - the type name (will be shown in devtools)
-* **extends** - (optional) the type to inherit from (defaults to Object). Ecma5-extend types, javascript types and DOM Element types are supported
-* **mixins** - (optional) a list of types to mix into this type
-* **private** - the private scope definition
-* **protected** - the protected scope definition
-* **public** - the public scope definition
-* **init** - called during object creation (after parent classes and before child classes)
-* **destroy** - called during object destruction (before parent classes and after child classes)
+* __`name`__ - the type name (will be shown in devtools)
+* __`extends`__ - (optional) the type to inherit from (defaults to Object). Ecma5-extend types, javascript types and DOM Element types are supported
+* __`mixins`__ - (optional) a list of types to mix into this type
+* __`private`__ - the private scope definition
+* __`protected`__ - the protected scope definition
+* __`public`__ - the public scope definition
+* __`init`__ - called during object creation (after parent classes and before child classes)
+* __`destroy`__ - called during object destruction (before parent classes and after child classes)
 
 
 ## Scope Definition Syntax ##
@@ -137,20 +140,20 @@ Scope definitions are used to declare properties and methods in ECMA5 property d
 
 ECMA5 properties are defined using the ECMA5 property descriptor syntax. ECMA5 supports both value and accessor/mutator properties.
 
-* **configurable** - true if the property can be re-defined
-* **writable** - true if the property can be changed using `object.property = value`
-* **enumerbale** - true if the property is iterated by `for ... in` loops
+* __`configurable`__ - true if the property can be re-defined
+* __`writable`__ - true if the property can be changed using `object.property = value`
+* __`enumerbale`__ - true if the property is iterated by `for ... in` loops
 
 
 ##### Value Properties #####
 
-* **value** - the initial value of the property
+* __`value`__ - the initial value of the property
 
 
 ##### Accessor / Mutator Properties #####
 
-* **get** - function which returns the current value of the property
-* **set** - function which sets the value of the property
+* __`get`__ - function which returns the current value of the property
+* __`set`__ - function which sets the value of the property
 
 [See MDN for more information](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#Description)
 
@@ -161,7 +164,7 @@ Ecma5-extend includes a parser that converts the traditional and shorthand forms
 
 * functions are read-only and not enumerable
 * objects are writable and enumerable
-* when only a set function is defined, a get function that returns `<private object>.<propertyname>` is assumed.
+* when only a set function is defined, a get function that returns `PrivateInterface.<propertyname>` is assumed.
 
 **Note: *implied getters and setters are faster than writing your own, so it use them wherever possible***
 
@@ -172,14 +175,20 @@ For traditional syntax, ecma5-extend assumes default values for the property des
         mymethod : function () {}
     };
 
+## Friends ##
+Ecma5-extend does not use strict typename validation to allow the implementation friend types. Instead
+it provides a mechanism for types to access eachother's PrivateInterfaces' on the type definition.
+
+__`getPrivate (object)`__ - returns the private interface for a `PublicInterface` of that type.
+*Throws __`TypeError`__ if `object` is not of this type.*
 
 ## Eventing ##
 
 Ecma5-extend provides a default implementation for an eventing system, with the following api
 
-* *public* **publish (event, ...)** - emit an event (supports multiple parameters)
-* *public* **subscribe (event, callback)** - subscribe to an event
-* *public* **unsubscribe (event, callback)** - unsubscribe from an event
+* *public* __`publish (event, ...)`__ - emit an event (supports multiple parameters)
+* *public* __`subscribe (event, callback)`__ - subscribe to an event
+* *public* __`unsubscribe (event, callback)`__ - unsubscribe from an event
 
 
 ### Automatic Change Events ###
@@ -198,9 +207,9 @@ If a *protected* method named *propertynameChanged* is defined, it will be calle
 
 Ecma5-extend will automatically install its publish/subscribe system unless one is provided by the developer or inherited from a parent type. The ecma5-extend publish/subscribe system can be customized by implementing the following api in a type definition:
 
-* *protected* **publish (event, ...)** - emit an event (supports multiple parameters)
-* *public* **subscribe (event, callback)** - subscribe to an event
-* *public* **unsubscribe (event, callback)** - unsubscribe from an event
+* *protected* __`publish (event, ...)`__ - emit an event (supports multiple parameters)
+* *public* __`subscribe (event, callback)`__ - subscribe to an event
+* *public* __`unsubscribe (event, callback)`__ - unsubscribe from an event
 
 
 ## Object Creation / Destruction ##

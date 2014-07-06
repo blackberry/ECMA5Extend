@@ -15,12 +15,28 @@
  * limitations under the License.
  */'use strict';
 
-var LIVERELOAD_PORT = 35729;
-var lrSnippet = require('connect-livereload')({
-    port : LIVERELOAD_PORT
-});
-var mountFolder = function(connect, dir) {
-    return connect.static(require('path').resolve(dir));
+var seed = Math.round(Math.random() * 100) * 10;
+var OPEN_PORT = 9043 + seed;
+var LIVERELOAD_PORT = 35729 + seed;
+var connectLivereload = require('connect-livereload');
+
+var connectOptions = function(index) {
+    index = index || 0;
+    return {
+        port : OPEN_PORT + index,
+        middleware : function(connect) {
+            return [connectLivereload({
+                port : LIVERELOAD_PORT + index * 1000
+            }), connect.static(require('path').resolve('./'))];
+        }
+    }
+};
+var watchOptions = function(index) {
+    return {
+        livereload : {
+            port : LIVERELOAD_PORT + (index || 0) * 1000
+        }
+    };
 };
 
 module.exports = function(grunt) {
@@ -103,32 +119,36 @@ module.exports = function(grunt) {
 
         open : {
             unit : {
-                path : 'http://0.0.0.0:<%= connect.options.port %>/test/unit-tests.html'
+                path : 'http://0.0.0.0:<%= connect.tdd.options.port %>/test/unit-tests.html'
+            },
+            jsdoc : {
+                path : 'http://0.0.0.0:<%= connect.jsdoc.options.port %>/docs/index.html'
             }
         },
 
         connect : {
             options : {
-                port : 9020,
                 // change this to '0.0.0.0' to access the server from outside
                 hostname : '0.0.0.0'
             },
             tdd : {
-                options : {
-                    middleware : function(connect) {
-                        return [lrSnippet, mountFolder(connect, configPaths.tests)];
-                    }
-                }
+                options : connectOptions(0)
+            },
+            jsdoc : {
+                options : connectOptions(1)
             }
         },
 
         watch : {
             tdd : {
-                options : {
-                    livereload : LIVERELOAD_PORT
-                },
-                files : ['src/**/*.js', '!src/style/*.js', 'src/**/*.html', 'src/**/*.less', 'test/*/*.js'],
+                options : watchOptions(0),
+                files : ['src/**/*.js', 'test/*/*.js'],
                 tasks : ['complexity', 'browserify:tests']
+            },
+            jsdoc : {
+                options : watchOptions(1),
+                files : ['src/**/*.js', 'README.md'],
+                tasks : ['jsdoc']
             }
         },
 
@@ -248,6 +268,7 @@ module.exports = function(grunt) {
     grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity', 'validate-package']);
     grunt.registerTask('validate:ci', ['jscs', 'jshint:ci', 'complexity']);
     grunt.registerTask('docs', ['jsdoc']);
+    grunt.registerTask('watch:docs', ['jsdoc', 'connect:jsdoc', 'open:jsdoc', 'watch:jsdoc'])
 
     grunt.registerTask('tdd', ['browserify:tests', 'connect:tdd', 'open:unit', 'watch:tdd']);
     grunt.registerTask('test', ['clean', 'browserify:tests', 'karma:desktop']);

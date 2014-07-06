@@ -1,15 +1,15 @@
 {
-    "plugins": [],
+    "plugins": ["plugins/markdown"],
     "opts": {
         "template": "./node_modules/ink-docstrap/template",
         "lenient": true,
-        "private": false
+        "private": true
     },
     "templates": {
-        "cleverLinks": false,
+        "cleverLinks": true,
         "monospaceLinks": false,
         "default": {
-            "outputSourceFiles": true
+            "outputSourceFiles": false
         },
         "systemName": "Documentation",
         "footer": "",
