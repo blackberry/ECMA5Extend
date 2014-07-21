@@ -1,6 +1,6 @@
-# ecma5-extend #
+# ECMA5-Extend #
 
-Ecma5-extend is a javascript library that provides a generic class structure for javascript. In contrast to other solutions, ecma5-extend classes are written in pure javascript and it requires support for ECMA5.
+ECMA5-Extend is a javascript library that provides a generic class structure for javascript. In contrast to other solutions, ECMA5-Extend classes are written in pure javascript. It requires support for ECMA5.
 
 ------------
 
@@ -17,31 +17,32 @@ Ecma5-extend is a javascript library that provides a generic class structure for
 
 ## Overview ##
 
-Ecma5-extend is a commonjs module for writing javascript types that behave like C++ classes. Ecma5-extend supports creating public, protected and private scopes on objects and includes a customizable publish/subscribe system. Ecma5-extend suports type inheritance for both JavaScript types and DOM Elements.
+ECMA5-Extend is a CommonJS module for writing javascript types that behave like C++ classes. ECMA5-Extend supports creating public, protected and private scopes on objects and includes a customizable publish/subscribe system. ECMA5-Extend suports type inheritance for both JavaScript types and DOM Elements.
 
     var personType = {
 
         name: "Person",
 
-        /* defaults to Object if not specified */
-        extends : Object,
+        // defaults to Object if not specified
+        extends: Object,
 
-        /* mixin other types or groups of functions */
-        mixins : [ executiveMixin ],
+        // mixin other types or groups of functions
+        mixins: [ executiveMixin ],
 
         public: {
-            /* read/write value property with default value */
+            // read/write value property with default value
             firstName: "Isaac",
 
-            /* read/write accessor/mutator property (implied getter) */
+            // read/write accessor/mutator property (implied getter)
             lastName: {
-                set: function(firstName) {
+                set: function(lastName) {
                     this.lastName = lastName;
                 }
             },
 
-            /* read-only accessor property */
+            // read-only accessor property
             fullName: {
+                set: undefined,
                 get: function() {
                     return this.concatinateName();
                 }
@@ -67,17 +68,17 @@ Ecma5-extend is a commonjs module for writing javascript types that behave like 
 
 ## Object Implementation ##
 
-To support private, protected and public scopes, ecma5-extend creates instance-specific objects for public and protected scopes and an instance-specific object for each ecma5-extend type in the type hierarchy.
+To support private, protected and public scopes, ECMA5-Extend creates instance-specific objects for public and protected scopes and an instance-specific object for each ECMA5-Extend type in the type hierarchy.
 
 
 #### Structure ####
 
-An ecma5-extend object is composed of at least three instance-specific objects: one public, one protected, and one private for each ecma5-extend type in the type hierarchy.
-* __`PublicInterface`__ - the 'instance' object that you get from Type.create(), this is the public api
-* __`ProtectedInterface`__ - an object shared between all the types in the type hierarcy, but invisible to the public api
+An ECMA5-Extend object is composed of at least three instance-specific objects: one public, one protected, and one private for each ECMA5-Extend type in the type hierarchy.
+* __`PublicInterface`__ - the 'instance' object that you get from Type.create(), this is the public API
+* __`ProtectedInterface`__ - an object shared between all the types in the type hierarchy, but invisible to the public API
 * __`PrivateInterface`__ - a type specific object that is not visible outside the type
 
-The structure of an ecma5-extend object is functionally equivalent to the following pseudo-code:
+The structure of an ECMA5-Extend object is functionally equivalent to the following pseudo-code:
 
     var publicObject = {
         __proto__ : /* public scope definition */
@@ -122,7 +123,7 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
     }
 
 * __`name`__ - the type name (will be shown in devtools)
-* __`extends`__ - (optional) the type to inherit from (defaults to Object). Ecma5-extend types, javascript types and DOM Element types are supported
+* __`extends`__ - (optional) the type to inherit from (defaults to Object). ECMA5-Extend types, javascript types and DOM Element types are supported
 * __`mixins`__ - (optional) a list of types to mix into this type
 * __`private`__ - the private scope definition
 * __`protected`__ - the protected scope definition
@@ -133,7 +134,7 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
 
 ## Scope Definition Syntax ##
 
-Scope definitions are used to declare properties and methods in ECMA5 property descriptor syntax, tradtional object syntax and custom short forms. For the latter cases, ecma5-extend will create and auto-fill an ECMA5 property descriptor.
+Scope definitions are used to declare properties and methods in ECMA5 property descriptor syntax, traditional object syntax and custom short forms. For the latter cases, ECMA5-Extend will create and auto-fill an ECMA5 property descriptor.
 
 
 #### ECMA5 Property Descriptor Syntax ###
@@ -160,7 +161,7 @@ ECMA5 properties are defined using the ECMA5 property descriptor syntax. ECMA5 s
 
 #### Short Forms and Default Values ####
 
-Ecma5-extend includes a parser that converts the traditional and shorthand forms to ECMA5 property descriptor, which sets default values according to the following rules:
+ECMA5-Extend includes a parser that converts the traditional and shorthand forms to ECMA5 property descriptor, which sets default values according to the following rules:
 
 * functions are read-only and not enumerable
 * objects are writable and enumerable
@@ -168,7 +169,7 @@ Ecma5-extend includes a parser that converts the traditional and shorthand forms
 
 **Note: *implied getters and setters are faster than writing your own, so it use them wherever possible***
 
-For traditional syntax, ecma5-extend assumes default values for the property descriptor. An example of traditional syntax is shown here:
+For traditional syntax, ECMA5-Extend assumes default values for the property descriptor. An example of traditional syntax is shown here:
 
     var publicDefinition = {
         myproperty : "myvalue",
@@ -176,15 +177,15 @@ For traditional syntax, ecma5-extend assumes default values for the property des
     };
 
 ## Friends ##
-Ecma5-extend does not use strict typename validation to allow the implementation friend types. Instead
-it provides a mechanism for types to access eachother's PrivateInterfaces' on the type definition.
+ECMA5-Extend does not use strict typename validation to allow the implementation friend types. Instead
+it provides a mechanism for types to access each other's PrivateInterfaces' on the type definition.
 
 __`getPrivate (object)`__ - returns the private interface for a `PublicInterface` of that type.
 *Throws __`TypeError`__ if `object` is not of this type.*
 
 ## Eventing ##
 
-Ecma5-extend provides a default implementation for an eventing system, with the following api
+ECMA5-Extend provides a default implementation for an eventing system, with the following API
 
 * *public* __`publish (event, ...)`__ - emit an event (supports multiple parameters)
 * *public* __`subscribe (event, callback)`__ - subscribe to an event
@@ -195,7 +196,7 @@ Ecma5-extend provides a default implementation for an eventing system, with the 
 
 **Caution: this behaviour may change in the future**
 
-Ecma5-extend automatically publishes a *propertyChanged* event when a **public** property is changed.
+ECMA5-Extend automatically publishes a *propertyChanged* event when a **public** property is changed.
 
 
 ### Intercepting Events ###
@@ -205,7 +206,7 @@ If a *protected* method named *propertynameChanged* is defined, it will be calle
 
 ### Custom Eventing ###
 
-Ecma5-extend will automatically install its publish/subscribe system unless one is provided by the developer or inherited from a parent type. The ecma5-extend publish/subscribe system can be customized by implementing the following api in a type definition:
+ECMA5-Extend will automatically install its publish/subscribe system unless one is provided by the developer or inherited from a parent type. The ECMA5-Extend publish/subscribe system can be customized by implementing the following API in a type definition:
 
 * *protected* __`publish (event, ...)`__ - emit an event (supports multiple parameters)
 * *public* __`subscribe (event, callback)`__ - subscribe to an event
@@ -224,6 +225,6 @@ Objects **must** be destroyed to have their memory reclaimed.
 
 ### DOM Objects ###
 
-When inheriting from DOM Element types, a *name* must be provided in the type definition. This name will be used to create the html tag name for your type.
+When inheriting from DOM Element types, a *name* must be provided in the type definition. This name will be used to create the HTML tag name for your type.
 
 To turn an already-existing dom node into your type, pass the DOM node as the first parameter to `type.create`. Otherwise, it will be created automatically.
