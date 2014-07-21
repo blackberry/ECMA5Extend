@@ -349,26 +349,36 @@ var defineSetProperty = function(privateRegistry, key) {
     };
 };
 
-var defineInit = function(privateRegistry, init, _super, name, mixins) {
+var defineInit = function(privateRegistry, init, _super, name, mixins, mixinExtended) {
     /**
      * Initialize an elsa object (Overridable)
      * @function initialize
      * @memberof ecma5-extend.Object.ProtectedInterface#
      */
     return function callInit() {
+        var i, len;
         //console.log(definition.name + ": callInit");
         if ( typeof _super === "function") {
             _super.apply(this, arguments);
         }
 
         if (mixins) {
-            mixins.forEach(function(mixin) {
-                mixin.apply(this.public, arguments);
-            });
+            len = mixins.length;
+            for ( i = 0; i < len; i++) {
+                mixins[i].apply(this.public, arguments);
+            }
+        }
+
+        var priv = privateRegistry[this.public.__id];
+        if (mixinExtended) {
+            len = mixinExtended.length;
+            for ( i = 0; i < len; i++) {
+                mixinExtended[i].init.apply(priv, arguments);
+            }
         }
 
         if ( typeof init === "function") {
-            init.apply(privateRegistry[this.public.__id], arguments);
+            init.apply(priv, arguments);
         }
     };
 };
@@ -391,7 +401,7 @@ var destroyObjectProperties = function(priv, type) {
     }
 };
 
-var defineDestroy = function(privateRegistry, destroy, _super, publicPrototype) {
+var defineDestroy = function(privateRegistry, destroy, _super, publicPrototype, mixinExtended) {
     /**
      * Destroy an elsa object (Overridable)
      * @function destroy
@@ -404,10 +414,18 @@ var defineDestroy = function(privateRegistry, destroy, _super, publicPrototype) 
         }
 
         if (destroy) {
-            destroy.apply(priv, arguments);
+            destroy.call(priv);
         }
+
+        if (mixinExtended) {
+            var len = mixinExtended.length;
+            for (var i = 0; i < len; i++) {
+                mixinExtended[i].destroy.call(priv);
+            }
+        }
+
         if (_super) {
-            _super.apply(this, arguments);
+            _super.call(this);
         }
 
         // we are is the 'final' type
@@ -491,7 +509,7 @@ var extendMixin = function(mixin) {
 };
 
 var extendPrivateScope = function(definition, privateDefn) {
-    Object.getOwnPropertyNames(definition.private || {}).forEach(function(key) {
+    Object.getOwnPropertyNames(definition.private).forEach(function(key) {
         var defn = definition.private[key];
         if (isPropertyDescriptor(defn)) {
             privateDefn[key] = defn;
@@ -527,6 +545,26 @@ var extendPrivateScope = function(definition, privateDefn) {
     };
 };
 
+var addExtencedMixins = function(definition) {
+    var mixin, name, len = definition.mixinExtended.length;
+    for (var i = 0; i < len; i++) {
+        mixin = definition.mixinExtended[i];
+        for (name in mixin.public) {
+            definition.public[name] = mixin.public[name];
+        }
+        for (name in mixin.protected) {
+            if (!( name in definition.protected)) {
+                definition.protected[name] = mixin.protected[name];
+            }
+        }
+        for (name in mixin.private) {
+            if (!( name in definition.private)) {
+                definition.private[name] = mixin.private[name];
+            }
+        }
+    }
+};
+
 /*
  * build a scope prototype from its definition
  * auto-fill ECMA5 descriptors
@@ -547,7 +585,7 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
         obj = Object.create(baseType.prototype);
     }
 
-    Object.getOwnPropertyNames(definition[scope] || {}).forEach(function(key) {
+    Object.getOwnPropertyNames(definition[scope]).forEach(function(key) {
         if (key === "constructor" && scope === "public") {
             return;
         } else if (key === "public" && (scope === "protected" || scope === "private")) {
@@ -663,25 +701,17 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
     }
 
     var mixins;
+    if (definition.mixin) {
+        mixins = Array.isArray(definition.mixin) ? definition.mixin : [definition.mixin];
+    }
+
     if (scope === "protected") {
-        if (definition.mixin) {
-            mixins = Array.isArray(definition.mixin) ? definition.mixin : [definition.mixin];
-            mixins = mixins.map(function(value) {
-                if ( typeof value.constructor === "function") {
-                    return value.constructor;
-                }
-                if ( typeof value === "function") {
-                    return value;
-                }
-            }, scopeDefn);
-        }
         scopeDefn.init = {
-            value : defineInit(privateRegistry, definition.init, Object.getPrototypeOf(obj).init, definition.name, mixins)
+            value : defineInit(privateRegistry, definition.init, Object.getPrototypeOf(obj).init, definition.name, mixins, definition.mixinExtended)
         };
     } else if (scope === "public") {
         scopeDefn.destroy = {
-            // TODO
-            value : defineDestroy(privateRegistry, definition.destroy, Object.getPrototypeOf(obj).destroy, obj)
+            value : defineDestroy(privateRegistry, definition.destroy, Object.getPrototypeOf(obj).destroy, obj, definition.mixinExtended)
         };
         if (definition.mixin) {
             mixins = Array.isArray(definition.mixin) ? definition.mixin : [definition.mixin];
@@ -916,6 +946,14 @@ var createType = function(definition) {
         self.tagName = "EL-" + definition.name.toUpperCase();
     }
     typeRegistry[definition.__id] = self;
+
+    definition.public = definition.public || {};
+    definition.protected = definition.protected || {};
+    definition.private = definition.private || {};
+
+    if (definition.mixinExtended) {
+        addExtencedMixins(definition);
+    }
 
     var privatePrototype = {}, privateDefn = {};
     Object.defineProperties(privatePrototype, {
