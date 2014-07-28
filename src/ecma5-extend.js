@@ -389,7 +389,7 @@ var destroyObjectProperties = function(priv, type) {
             var value = priv[key];
             if (value && typeof value === "object") {
                 if (exports.memoryLeakWarnings) {
-                    console.warn("ecma5-extend.memoryLeakWarning %s.%s = %s", type.name, key, value.tagName ? "<" + value.tagName.toLowerCase() + ">" : value);
+                    console.warn("ecma5-extend.memoryLeakWarning " + type.name + "." + key + " = " + (value.tagName ? "<" + value.tagName.toLowerCase() + ">" : value));
                 }
                 if (exports.memoryLeakProtector) {
                     Object.defineProperty(priv, key, {
