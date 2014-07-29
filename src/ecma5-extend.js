@@ -142,23 +142,15 @@ if ( typeof Object.setPrototypeOf === "undefined") {
  * @property {function} protected(methodname,...) Calls the super-class protected implementation of `methodname`
  * *Throws **`TypeError`** if a protected super method `methodname` does not exist*
  */
-
-var getPublicSuper = function getPublicSuper(methodName) {
-    var _this = this.object;
-    var _super = _this.public[methodName].__super__;
-    if (!_super) {
-        throw new TypeError(_this.public.constructor.name + ".public." + methodName + " does not have a super method");
-    }
-    return _super.apply(_this.public, Array.prototype.slice.call(arguments, 1));
-};
-
-var getProtectedSuper = function getProtectedSuper(methodName) {
-    var _this = this.object;
-    var _super = _this.protected[methodName].__super__;
-    if (!_super) {
-        throw new TypeError(_this.public.constructor.name + ".protected." + methodName + " does not have a super method");
-    }
-    return _super.apply(_this.public, Array.prototype.slice.call(arguments, 1));
+var defineSuper = function(prototype, scope) {
+    return function getSuper(methodName) {
+        var _this = this.object;
+        var _super = Object.getPrototypeOf(prototype)[methodName];
+        if (!_super) {
+            throw new TypeError(_this.public.constructor.name + "." + scope + "." + methodName + " does not have a super method");
+        }
+        return _super.apply(_this.public, Array.prototype.slice.call(arguments, 1));
+    };
 };
 
 /**
@@ -508,7 +500,7 @@ var extendMixin = function(mixin) {
     }, this);
 };
 
-var extendPrivateScope = function(definition, privateDefn) {
+var extendPrivateScope = function(definition, privateDefn, protectedPrototype, publicPrototype) {
     Object.getOwnPropertyNames(definition.private).forEach(function(key) {
         var defn = definition.private[key];
         if (isPropertyDescriptor(defn)) {
@@ -526,11 +518,11 @@ var extendPrivateScope = function(definition, privateDefn) {
     var _super = {};
     Object.defineProperties(_super, {
         "public" : {
-            value : getPublicSuper,
+            value : defineSuper(publicPrototype, "public"),
             writable : false
         },
         "protected" : {
-            value : getProtectedSuper,
+            value : defineSuper(protectedPrototype, "protected"),
             writable : false
         }
     });
@@ -545,7 +537,7 @@ var extendPrivateScope = function(definition, privateDefn) {
     };
 };
 
-var addExtencedMixins = function(definition) {
+var addExtendedMixins = function(definition) {
     var mixin, name, len = definition.mixinExtended.length;
     for (var i = 0; i < len; i++) {
         mixin = definition.mixinExtended[i];
@@ -606,11 +598,6 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
         }
         if ( typeof defn.value === "function") {
             var callMethod = defineCallMethod(privateRegistry, defn.value);
-            var _super = Object.getPrototypeOf(obj)[key];
-            if ( typeof _super === "function") {
-                callMethod.__super__ = _super;
-                //console.log("INSTALL SUPER " + definition.name + " " + scope + "." + key);
-            }
             scopeDefn[key] = {
                 enumerable : defn.enumerable || false,
                 configurable : defn.configurable || false,
@@ -848,6 +835,15 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
     };
 };
 
+var defineTypeGetPrivate = function(publicPrototype, privateRegistry) {
+    return function(object) {
+        if (!publicPrototype.isPrototypeOf(object)) {
+            throw TypeError("object " + object.constructor.name + " is not of type " + publicPrototype.constructor.name);
+        }
+        return privateRegistry[object.__id];
+    };
+};
+
 /**
  * check if an object is an ecma5-extend type
  *
@@ -896,31 +892,19 @@ var createType = function(definition) {
     if (definition.__id) {
         return typeRegistry[definition.__id];
     }
-    var privateRegistry = {};
+    var privateRegistry = {}, privateDefn = {}, privatePrototype = {}, protectedPrototype, publicPrototype;
+    var self, baseType = null, ultimateType = true;
+    var baseTypeDefinition = definition.extend;
+
     Object.defineProperties(definition, {
         "__id" : {
             writable : false,
             configurable : false,
             enumerable : false,
             value : definitionCount++
-        },
-        getPrivate : {
-            writable : false,
-            configurable : false,
-            enumerable : false,
-            value : function(object) {
-                if (!publicPrototype.isPrototypeOf(object)) {
-                    throw TypeError("object " + object.constructor.name + " is not of type " + publicPrototype.constructor.name);
-                }
-                return privateRegistry[object.__id];
-            }
         }
     });
 
-    var baseTypeDefinition = definition.extend;
-
-    var baseType = null, self;
-    var ultimateType = true;
     if (!baseTypeDefinition) {
         self = {};
     } else if ( typeof baseTypeDefinition.create === "function" && baseTypeDefinition !== Object) {
@@ -952,20 +936,19 @@ var createType = function(definition) {
     definition.private = definition.private || {};
 
     if (definition.mixinExtended) {
-        addExtencedMixins(definition);
+        addExtendedMixins(definition);
     }
 
-    var privatePrototype = {}, privateDefn = {};
     Object.defineProperties(privatePrototype, {
         "privateRegistry" : {
             value : privateRegistry
         }
     });
-    var protectedPrototype = extendScope(definition, "protected", baseType, privateDefn, privateRegistry, ultimateType);
-    var publicPrototype = extendScope(definition, "public", baseType, privateDefn, privateRegistry, ultimateType);
+    protectedPrototype = extendScope(definition, "protected", baseType, privateDefn, privateRegistry, ultimateType);
+    publicPrototype = extendScope(definition, "public", baseType, privateDefn, privateRegistry, ultimateType);
 
     // public/protected extendScope MUST be before this ??
-    extendPrivateScope(definition, privateDefn);
+    extendPrivateScope(definition, privateDefn, protectedPrototype, publicPrototype);
     Object.defineProperties(privatePrototype, privateDefn);
 
     // TODO: pull these out for scope save reduction
@@ -982,6 +965,15 @@ var createType = function(definition) {
             writable : false,
             enumerable : false,
             value : self
+        }
+    });
+
+    Object.defineProperties(definition, {
+        getPrivate : {
+            writable : false,
+            configurable : false,
+            enumerable : false,
+            value : defineTypeGetPrivate(publicPrototype, privateRegistry)
         }
     });
 

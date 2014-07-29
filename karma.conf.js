@@ -5,8 +5,8 @@ module.exports = function(config) {
     // remote devices can connect back to the server hosted on the host and
     // launch the tests.
     function getLocalIP() {
-        if (process.env.SERVE_IP) {
-            return process.env.SERVE_IP;
+        if (process.env.HOST_IP) {
+            return process.env.HOST_IP;
         }
         var interfaces = require('os').networkInterfaces();
         for (var i in interfaces) {
