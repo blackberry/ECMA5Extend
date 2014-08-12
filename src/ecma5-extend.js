@@ -718,8 +718,15 @@ var isHTMLType = function(object) {
     return (object.prototype instanceof window.Node || object instanceof window.Node);
 };
 
+var EXTEND_ORACLE = "75E3BA8C-63AF-45DE-85C3-260FF96453B9";
 var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, protectedPrototype, privatePrototype) {
     var self = desc.self;
+    var extend = function(properties) {
+        return Object.create(protectedPrototype, properties || {});
+    };
+    Object.defineProperty(extend, " oracle ", {
+        value : EXTEND_ORACLE
+    });
     return {
         create : {
             /**
@@ -727,12 +734,11 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
              * @name create
              * @memberof ecma5-extend.Type#
              */
-            value : function() {
+            value : function(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
                 var args = Array.prototype.slice.apply(arguments);
-                var iPublic;
 
                 if (this === self) {
-                    var __id = objectCount++;
+                    var __id = objectCount++, iPublic;
                     if (isHTMLType(args[0]) && isHTMLType(publicPrototype)) {
                         iPublic = args[0];
                         args = args.slice(1);
@@ -743,7 +749,20 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
                         iPublic = document.createElement(this.tagName);
                         Object.setPrototypeOf(iPublic, publicPrototype);
                     } else {
-                        iPublic = Object.create(publicPrototype);
+                        var RootType = desc ? desc.baseType : undefined;
+                        while (RootType && typeof RootType.extend === "function" && RootType.extend[' oracle '] === EXTEND_ORACLE) {
+                            var proto = Object.getPrototypeOf(RootType.prototype);
+                            RootType = proto ? proto.constructor : undefined;
+                        }
+
+                        if (RootType && typeof RootType === 'function') {
+                            // lets use `new` which *should* be supported
+                            iPublic = new RootType(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p);
+                            Object.setPrototypeOf(iPublic, publicPrototype);
+                        } else {
+                            // we have no root constructor, so just create from our prototype
+                            iPublic = Object.create(publicPrototype);
+                        }
                     }
                     Object.defineProperty(iPublic, "__id", {
                         configurable : true,
@@ -767,12 +786,16 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
                         }
                     });
 
-                    var instance = self.create.apply(iProtected, args);
+                    // call the branch below to chain up the extend type hierarchy to create private objects
+                    self.create.apply(iProtected, args);
+
+                    // run the type initialization code (chains through the types)
                     iProtected.init.apply(iProtected, args);
-                    return instance;
+
+                    return iPublic;
                 } else {
                     /* chain to base clase: this === iProtected */
-                    if (desc.baseType && typeof desc.baseType.extend === "function") {
+                    if (desc.baseType && typeof desc.baseType.extend === "function" && desc.baseType.extend[' oracle '] === EXTEND_ORACLE) {
                         desc.baseType.create.apply(this, args);
                     }
 
@@ -792,14 +815,11 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
                     });
 
                     desc.privateRegistry[this.public.__id] = iPrivate;
-                    return this.public;
                 }
             }
         },
         extend : {
-            value : function(properties) {
-                return Object.create(protectedPrototype, properties || {});
-            }
+            value : extend
         },
         "prototype" : {
             enumerable : true,
@@ -852,8 +872,8 @@ var defineTypeGetPrivate = function(publicPrototype, privateRegistry) {
  * @returns {Boolean}
  */
 var isType = function isType(type) {
-    if ( typeof type.__id === "number") {
-        return (typeRegistry[type.__id] === type);
+    if ( typeof type.extend === "function") {
+        return type.extend[' oracle '] === EXTEND_ORACLE;
     } else {
         return false;
     }

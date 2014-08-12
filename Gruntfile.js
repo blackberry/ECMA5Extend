@@ -193,6 +193,15 @@ module.exports = function(grunt) {
                     dir : 'artifact/'
                 }
             },
+            custom : {
+                browsers : [],
+                logLevel : 'INFO',
+                singleRun : false,
+                coverageReporter : {
+                    type : 'html',
+                    dir : 'artifact/'
+                }
+            },
             sanity : {
                 browsers : ['Chrome'],
                 logLevel : 'WARN',
