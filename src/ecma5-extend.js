@@ -734,7 +734,7 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
              * @name create
              * @memberof ecma5-extend.Type#
              */
-            value : function(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
+            value : function() {
                 var args = Array.prototype.slice.apply(arguments);
 
                 if (this === self) {
@@ -757,7 +757,7 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
 
                         if (RootType && typeof RootType === 'function') {
                             // lets use `new` which *should* be supported
-                            iPublic = new RootType(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p);
+                            iPublic = new (Function.prototype.bind.apply(RootType, [RootType].concat(args)))();
                             Object.setPrototypeOf(iPublic, publicPrototype);
                         } else {
                             // we have no root constructor, so just create from our prototype
