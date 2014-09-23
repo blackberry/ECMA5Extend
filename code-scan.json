@@ -1,0 +1,6 @@
+{
+    "includeDirs": [
+        "src",
+        "test"
+    ]
+}
