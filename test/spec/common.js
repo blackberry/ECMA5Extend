@@ -40,6 +40,24 @@ module.exports = {
             expect(Object.getPrototypeOf(obj).propertyIsEnumerable(propName)).to.equal(enumerable);
         }
     },
+    propertyTesterStatic : function(type, propName, value, writable, enumerable) {
+        expect(type[propName]).to.eql(value);
+
+        if (writable) {
+            var tmp = type[propName];
+            type[propName] = "testValue";
+            expect(type[propName]).to.equal("testValue");
+            type[propName] = tmp;
+        } else {
+            type[propName] = "testValue";
+            expect(type[propName]).to.equal(value);
+            type[propName] = value;
+        }
+
+        if (enumerable !== undefined) {
+            expect(type.propertyIsEnumerable(propName)).to.equal(enumerable);
+        }
+    },
     methodTester : function(obj, methodName, value) {
         var args = Array.prototype.slice.call(arguments, 3);
         expect(obj[methodName].apply(obj, args)).to.equal(value);

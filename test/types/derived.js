@@ -22,6 +22,10 @@ module.exports = {
 
     extend : Extend.createType(require("./base.js")),
 
+    someFunction : function() {
+        return "someValue";
+    },
+
     private : {
         x : 202
     },

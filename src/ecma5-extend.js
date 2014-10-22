@@ -97,6 +97,7 @@
  */
 
 var NOTIFY_ALL = true;
+var STATIC_IGNORE_NAMES = ['name', 'extend', 'extends', 'public', 'private', 'protected', 'init', 'destroy', 'mixin', 'mixins', 'tagName', 'tagname'];
 
 var objectCount = 1;
 var definitionCount = 1;
@@ -500,18 +501,21 @@ var extendMixin = function(mixin) {
     }, this);
 };
 
-var extendPrivateScope = function(definition, privateDefn, protectedPrototype, publicPrototype) {
-    Object.getOwnPropertyNames(definition.private).forEach(function(key) {
-        var defn = definition.private[key];
-        if (isPropertyDescriptor(defn)) {
-            privateDefn[key] = defn;
-        } else {
-            privateDefn[key] = {
-                configurable : true,
-                writable : true,
-                enumerable : true,
-                value : defn
-            };
+var extendSimpleScope = function(definitionObj, propertyDescriptors, protectedPrototype, publicPrototype, ignore) {
+    ignore = ignore || [];
+    Object.getOwnPropertyNames(definitionObj).forEach(function(key) {
+        if (ignore.indexOf(key) === -1) {
+            var defn = definitionObj[key];
+            if (isPropertyDescriptor(defn)) {
+                propertyDescriptors[key] = defn;
+            } else {
+                propertyDescriptors[key] = {
+                    configurable : true,
+                    writable : true,
+                    enumerable : true,
+                    value : defn
+                };
+            }
         }
     });
 
@@ -526,13 +530,13 @@ var extendPrivateScope = function(definition, privateDefn, protectedPrototype, p
             writable : false
         }
     });
-    privateDefn["super"] = {
+    propertyDescriptors["super"] = {
         get : function() {
             _super.object = this;
             return _super;
         }
     };
-    privateDefn.getPrivate = {
+    propertyDescriptors.getPrivate = {
         value : getPrivate
     };
 };
@@ -950,6 +954,9 @@ var createType = function(definition) {
         self.tagName = "EL-" + definition.name.toUpperCase();
     }
     typeRegistry[definition.__id] = self;
+    var typeDescriptor = {};
+    extendSimpleScope(definition, typeDescriptor, protectedPrototype, publicPrototype, STATIC_IGNORE_NAMES);
+    Object.defineProperties(self, typeDescriptor);
 
     definition.public = definition.public || {};
     definition.protected = definition.protected || {};
@@ -968,7 +975,7 @@ var createType = function(definition) {
     publicPrototype = extendScope(definition, "public", baseType, privateDefn, privateRegistry, ultimateType);
 
     // public/protected extendScope MUST be before this ??
-    extendPrivateScope(definition, privateDefn, protectedPrototype, publicPrototype);
+    extendSimpleScope(definition.private, privateDefn, protectedPrototype, publicPrototype);
     Object.defineProperties(privatePrototype, privateDefn);
 
     // TODO: pull these out for scope save reduction
@@ -997,9 +1004,9 @@ var createType = function(definition) {
         }
     });
 
-    // TODO : remove for release 1
-    self.private = privatePrototype;
-    self.protected = protectedPrototype;
+    // Note : enable these to peer into 'forbidden' scopes
+    //self.private = privatePrototype;
+    //self.protected = protectedPrototype;
 
     return self;
 };

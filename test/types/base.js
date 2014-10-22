@@ -23,6 +23,11 @@ module.exports = {
 
     /*tagName : "EL-BASECLASS",*/
 
+    debug : true,
+    someOption : {
+        value : "someValue"
+    },
+
     private : {
         x : 101,
         c : "c",

@@ -19,21 +19,24 @@ var Extend = require('ecma5-extend');
 var common = require("./common.js");
 
 var definition = require('../types/derived.js');
-var Type;
 
 describe('derived.js', function() {
 
-    it('create a Type', function() {
-        Type = Extend.createType(definition);
-        common.typeTester(Type, "DerivedClass");
+    it('create a this.Type', function() {
+        this.Type = Extend.createType(definition);
+        common.typeTester(this.Type, "DerivedClass");
+    });
+
+    it('type property', function() {
+        common.propertyTesterStatic(this.Type, "someOption", "someValue", false, false);
     });
 
     it('create an instance', function() {
-        this.obj = Type.create();
+        this.obj = this.Type.create();
     });
 
     it('add an instance to the dom', function() {
-        common.domTester(this.obj, Type.tagName);
+        common.domTester(this.obj, this.Type.tagName);
     });
 
     it('override value property (a)', function() {

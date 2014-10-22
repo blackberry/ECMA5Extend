@@ -19,21 +19,32 @@ var Extend = require('ecma5-extend');
 var common = require("./common.js");
 
 var definition = require('../types/base.js');
-var Type;
 
 describe('base.js', function() {
 
     it('create a Type', function() {
-        Type = Extend.createType(definition);
-        common.typeTester(Type, "BaseClass");
+        this.Type = Extend.createType(definition);
+        common.typeTester(this.Type, "BaseClass");
+    });
+
+    it('simple type property', function() {
+        common.propertyTesterStatic(this.Type, "debug", true, true, true);
+    });
+
+    it('type property', function() {
+        common.propertyTesterStatic(this.Type, "someOption", "someValue", false, false);
     });
 
     it('create an instance', function() {
-        this.obj = Type.create();
+        this.obj = this.Type.create();
     });
 
     it('add an instance to the dom', function() {
-        common.domTester(this.obj, Type.tagName);
+        common.domTester(this.obj, this.Type.tagName);
+    });
+
+    it('simple object property', function() {
+        common.propertyTester(this.obj, "i", undefined, true, true);
     });
 
     it('value property', function() {

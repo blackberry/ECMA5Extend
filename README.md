@@ -24,10 +24,10 @@ ECMA5-Extend is a CommonJS module for writing javascript types that behave like 
         name: "Person",
 
         // defaults to Object if not specified
-        extends: Object,
+        extend: Object,
 
         // mixin other types or groups of functions
-        mixins: [ executiveMixin ],
+        mixin: [ executiveMixin ],
 
         public: {
             // read/write value property with default value
@@ -105,8 +105,9 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
 
     var typeDefinition = {
         name : "mycustomtype",
-        extends : Object,
-        mixins : [/* list of types to mix in */],
+        extend : Object,
+        mixin : [/* list of types to mix in */],
+        someStaticProperty : "someStaticPropertyValue",
         private : {
             /* private scope definition */
         },
@@ -123,14 +124,14 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
     }
 
 * __`name`__ - the type name (will be shown in devtools)
-* __`extends`__ - (optional) the type to inherit from (defaults to Object). ECMA5-Extend types, javascript types and DOM Element types are supported
-* __`mixins`__ - (optional) a list of types to mix into this type
+* __`extend`__ - (optional) the type to inherit from (defaults to Object). ECMA5-Extend types, javascript types and DOM Element types are supported
+* __`mixin`__ - (optional) a list of types to mix into this type
 * __`private`__ - the private scope definition
 * __`protected`__ - the protected scope definition
 * __`public`__ - the public scope definition
 * __`init`__ - called during object creation (after parent classes and before child classes)
 * __`destroy`__ - called during object destruction (before parent classes and after child classes)
-
+* __others__ - properties to be defined on the type object (shared between all instances)
 
 ## Scope Definition Syntax ##
 
@@ -228,3 +229,19 @@ Objects **must** be destroyed to have their memory reclaimed.
 When inheriting from DOM Element types, a *name* must be provided in the type definition. This name will be used to create the HTML tag name for your type.
 
 To turn an already-existing dom node into your type, pass the DOM node as the first parameter to `type.create`. Otherwise, it will be created automatically.
+
+## Runtime API ##
+
+Runtime type information is available through the following apis on the `PrivateInterface`:
+
+__`getPrivate (object)`__ - returns the private interface for a `PublicInterface` of this type.
+*Throws __`TypeError`__ if `object` is not of this type.*
+
+__`super.public(functionName, ...)`__ - calls the public method `functionName` on the base type of this type.
+
+__`super.protected(functionName, ...)`__ - calls the super protected `functionName` on the base type of this type.
+
+To retrieve the type hierarchy for an object, use the following code:
+
+    var type = Object.getPrototypeOf(obj).constructor;
+    var typeName = type.name;
