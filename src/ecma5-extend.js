@@ -27,6 +27,11 @@
  * @property {boolean} memoryLeakProtection - Enables memory leak protection for ecma5-extend classes.
  * Memory leak protection automatically deletes properties on the private and protected objects during destroy. (Default: false)
  *
+ * @property {boolean} autoNotifyOnSet - Determines if a class's property setters will automatically publish
+ * a propertyChanged event when the value is set. This does not affect the protected interface propertyChanged
+ * API, which will be called regardless of this option. This value can be overridden by individual object
+ * definitions. (default: true)
+ *
  */
 
 /**
@@ -57,6 +62,28 @@
  *
  * @class Object
  * @memberof ecma5-extend
+ *
+ * @property {string} name - The name of the type
+ *
+ * @property {object} extend - An ecma5-extend, HTMLElement or javascript type
+ *
+ * @property {Array.<object>} mixin - A list of ecma5-extend mixins
+ *
+ * @property {Array.<object>} mixinExtended - A list of ecma5-extend extended mixins with init()/destroy() support
+ *
+ * @property {ecma5-extend.Object.PublicInterface} public - The public interface
+ *
+ * @property {ecma5-extend.Object.ProtectedInterface} protected - The protected interface
+ *
+ * @property {ecma5-extend.Object.PrivateInterface} private - The private interface
+ *
+ * @property {function} init - The constructor function
+ *
+ * @property {function} destroy - The destructor function
+ *
+ * @property {boolean} autoNotifyOnSet - Determines if a class's property setters will automatically publish
+ * a propertyChanged event when the value is set. This does not affect the protected interface propertyChanged
+ * API, which will be called regardless of this option. This value overrides the global value. (default: true)
  *
  */
 
@@ -97,14 +124,15 @@
  */
 
 var NOTIFY_ALL = true;
-var STATIC_IGNORE_NAMES = ['name', 'extend', 'extends', 'public', 'private', 'protected', 'init', 'destroy', 'mixin', 'mixins', 'tagName', 'tagname'];
+var STATIC_IGNORE_NAMES = ['name', 'extend', 'extends', 'public', 'private', 'protected', 'init', 'destroy', 'mixin', 'mixins', 'tagName', 'tagname', 'mixinExtended', 'autoNotifyOnSet'];
 
 var objectCount = 1;
 var definitionCount = 1;
 
 var exports = {
     memoryLeakWarnings : true,
-    memoryLeakProtector : false
+    memoryLeakProtector : false,
+    autoNotifyOnSet : true
 };
 var typeRegistry = {};
 
@@ -260,7 +288,7 @@ var definePublish = function(privateRegistry) {
     };
 };
 
-var definePublicPublish = function(privateRegistry) {
+var definePublicPublishNotify = function(privateRegistry) {
     /**
      * Publish an event on the object. For default behavior see {@link ecma5-extend.Object.ProtectedInterface#publish Object.publish}.
      *
@@ -271,6 +299,12 @@ var definePublicPublish = function(privateRegistry) {
      * @param {*} [oldvalue] - The old value associated with the event
      * @returns {boolean} If the event was cancelled
      */
+    return function publish(eventName, newValue, oldValue) {
+        var priv = privateRegistry[this.__id];
+        return priv.protected.publish(eventName, newValue, oldValue);
+    };
+};
+var definePublicPublish = function(privateRegistry) {
     return function publish(eventName, newValue, oldValue) {
         var priv = privateRegistry[this.__id];
         return priv.protected.publish(eventName, newValue, oldValue);
@@ -295,6 +329,18 @@ var defineGetProperty = function(privateRegistry, propertyName) {
     };
 };
 
+var defineSetPublicAccessorPropertyNotify = function(privateRegistry, set, notifyKey) {
+    return function setProperty(value) {
+        var priv = privateRegistry[this.__id];
+        //if (get)
+        //  var oldValue = get.call(priv);
+        set.call(priv, value);
+        if ( typeof priv.protected[notifyKey] === "function") {
+            priv.protected[notifyKey](value);
+        }
+        priv.protected.publish(notifyKey, value);
+    };
+};
 var defineSetPublicAccessorProperty = function(privateRegistry, set, notifyKey) {
     return function setProperty(value) {
         var priv = privateRegistry[this.__id];
@@ -323,7 +369,7 @@ var defineSetAccessorProperty = function(privateRegistry, set) {
     };
 };
 
-var defineSetPublicProperty = function(privateRegistry, key) {
+var defineSetPublicPropertyNotify = function(privateRegistry, key) {
     var notifyKey = key + "Changed";
     return function setProperty(value) {
         var priv = privateRegistry[this.__id];
@@ -333,6 +379,17 @@ var defineSetPublicProperty = function(privateRegistry, key) {
             priv.protected[notifyKey](value, oldValue);
         }
         priv.protected.publish(notifyKey, value, oldValue);
+    };
+};
+var defineSetPublicProperty = function(privateRegistry, key) {
+    var notifyKey = key + "Changed";
+    return function setProperty(value) {
+        var priv = privateRegistry[this.__id];
+        var oldValue = priv[key];
+        priv[key] = value;
+        if ( typeof priv.protected[notifyKey] === "function") {
+            priv.protected[notifyKey](value, oldValue);
+        }
     };
 };
 
@@ -581,6 +638,8 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
         obj = Object.create(baseType.prototype);
     }
 
+    var autoNotifyOnSet = "autoNotifyOnSet" in definition ? definition.autoNotifyOnSet : exports.autoNotifyOnSet;
+
     Object.getOwnPropertyNames(definition[scope]).forEach(function(key) {
         if (key === "constructor" && scope === "public") {
             return;
@@ -629,7 +688,7 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
             set = defn.set;
             if (defn.publish || NOTIFY_ALL) {
                 if (scope === "public") {
-                    descriptor.set = defineSetPublicAccessorProperty(privateRegistry, set, notifyKey);
+                    descriptor.set = (autoNotifyOnSet ? defineSetPublicAccessorPropertyNotify : defineSetPublicAccessorProperty)(privateRegistry, set, notifyKey);
                 } else {
                     descriptor.set = defineSetProtectedAccessorProperty(privateRegistry, set, notifyKey);
                 }
@@ -648,7 +707,7 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
             if (defn.writable !== false) {
                 if (defn.publish || NOTIFY_ALL) {
                     if (scope === "public") {
-                        descriptor.set = defineSetPublicProperty(privateRegistry, key);
+                        descriptor.set = (autoNotifyOnSet ? defineSetPublicPropertyNotify : defineSetPublicProperty)(privateRegistry, key);
                     } else {
                         descriptor.set = defineSetProperty(privateRegistry, key);
                     }
@@ -686,7 +745,7 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
                 enumerable : false,
                 configurable : false,
                 writable : false,
-                value : definePublicPublish(privateRegistry)
+                value : (autoNotifyOnSet ? definePublicPublishNotify : definePublicPublish)(privateRegistry)
             };
         }
     }
@@ -954,9 +1013,6 @@ var createType = function(definition) {
         self.tagName = "EL-" + definition.name.toUpperCase();
     }
     typeRegistry[definition.__id] = self;
-    var typeDescriptor = {};
-    extendSimpleScope(definition, typeDescriptor, protectedPrototype, publicPrototype, STATIC_IGNORE_NAMES);
-    Object.defineProperties(self, typeDescriptor);
 
     definition.public = definition.public || {};
     definition.protected = definition.protected || {};
@@ -977,6 +1033,10 @@ var createType = function(definition) {
     // public/protected extendScope MUST be before this ??
     extendSimpleScope(definition.private, privateDefn, protectedPrototype, publicPrototype);
     Object.defineProperties(privatePrototype, privateDefn);
+
+    var typeDescriptor = {};
+    extendSimpleScope(definition, typeDescriptor, protectedPrototype, publicPrototype, STATIC_IGNORE_NAMES);
+    Object.defineProperties(self, typeDescriptor);
 
     // TODO: pull these out for scope save reduction
     Object.defineProperties(self, defineTypeProperties({

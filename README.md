@@ -17,7 +17,7 @@ ECMA5-Extend is a javascript library that provides a generic class structure for
 
 ## Overview ##
 
-ECMA5-Extend is a CommonJS module for writing javascript types that behave like C++ classes. ECMA5-Extend supports creating public, protected and private scopes on objects and includes a customizable publish/subscribe system. ECMA5-Extend suports type inheritance for both JavaScript types and DOM Elements.
+ECMA5-Extend is a CommonJS module for writing javascript types that behave like C++ classes. ECMA5-Extend supports creating public, protected and private scopes on objects and includes a customizable publish/subscribe system. ECMA5-Extend suports type inheritance for both JavaScript types and DOM Elements. (see Type Definition Syntax for more information)
 
     var personType = {
 
@@ -101,7 +101,7 @@ Unless otherwise implemented, **all properties are stored on the `PrivateInterfa
 
 ## Type Definition Syntax ##
 
-Types are defined in a custom object format that uses ECMA5 style scope definitions as well as several short-forms. All parameters are optional.
+Types are defined in a custom object format that uses ECMA5 style scope definitions as well as several short-forms. All parameters are optional. (see {@link ecma5-extend.Object} for more information)
 
     var typeDefinition = {
         name : "mycustomtype",
@@ -126,6 +126,7 @@ Types are defined in a custom object format that uses ECMA5 style scope definiti
 * __`name`__ - the type name (will be shown in devtools)
 * __`extend`__ - (optional) the type to inherit from (defaults to Object). ECMA5-Extend types, javascript types and DOM Element types are supported
 * __`mixin`__ - (optional) a list of types to mix into this type
+* __`extendedMixin`__ - (optional) a list of types to mix into this type with init()/destroy()
 * __`private`__ - the private scope definition
 * __`protected`__ - the protected scope definition
 * __`public`__ - the public scope definition

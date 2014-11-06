@@ -1,7 +1,7 @@
 {
   "name": "ecma5-extend",
   "description": "Create OOP-style classes with javascript",
-  "version": "0.2.0-1",
+  "version": "0.2.1-1",
   "homepage": "http://gerrit.rim.net/gitweb?p=meapclient/ecma5-extend.git",
   "author": {
     "name": "Isaac Gordezky",
