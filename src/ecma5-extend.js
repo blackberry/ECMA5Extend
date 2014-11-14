@@ -313,6 +313,10 @@ var definePublicPublish = function(privateRegistry) {
 
 var defineCallMethod = function(privateRegistry, fcn) {
     return function callMethod() {
+        //TODO investigate race condition
+        if (!privateRegistry[this.__id]) {
+            console.error('callMethod - privateRegistry[this.__id] is undefined', privateRegistry, this);
+        }
         return fcn.apply(privateRegistry[this.__id], arguments);
     };
 };
