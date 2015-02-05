@@ -42,12 +42,6 @@
  */
 
 /**
- * @function create
- * @memberof ecma5-extend.Type#
- * @returns {ecma5-extend.Object} A new ecma5-extend object
- */
-
-/**
  * The common interface shared by every object that is an instance of an ecma5-extend type.
  *
  * Due to the limitations of javascript types, a single ecma5-extend instance has three associated objects:
@@ -788,9 +782,14 @@ var isHTMLType = function(object) {
 var EXTEND_ORACLE = "75E3BA8C-63AF-45DE-85C3-260FF96453B9";
 var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, protectedPrototype, privatePrototype) {
     var self = desc.self;
-    var extend = function(properties) {
-        return Object.create(protectedPrototype, properties || {});
-    };
+    var extend;
+    if (desc.final !== true) {
+        extend = function(properties) {
+            return Object.create(protectedPrototype, properties || {});
+        };
+    } else {
+        extend = function() {};
+    }
     Object.defineProperty(extend, " oracle ", {
         value : EXTEND_ORACLE
     });
@@ -798,39 +797,97 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
         create : {
             /**
              * Create an instance of this type.
-             * @name create
+             * @method create
              * @memberof ecma5-extend.Type#
+             * @param  {...*} [arguments] Initialization arguments to be passed to the type init() function
+             * @return {ecma5-extend.Object} An initialized ecma5-extend object
              */
             value : function() {
-                var args = Array.prototype.slice.apply(arguments);
+                var iPublic;
+                var RootType = desc ? desc.baseType : undefined;
+                while (RootType && typeof RootType.extend === "function" && RootType.extend[' oracle '] === EXTEND_ORACLE) {
+                    var proto = Object.getPrototypeOf(RootType.prototype);
+                    RootType = proto ? proto.constructor : undefined;
+                }
 
-                if (this === self) {
-                    var __id = objectCount++, iPublic;
-                    if (isHTMLType(args[0]) && isHTMLType(self.prototype) && args[0].tagName === self.tagName) {
-                        iPublic = args[0];
-                        args = args.slice(1);
-                        if (Object.getPrototypeOf(iPublic) !== publicPrototype) {
-                            Object.setPrototypeOf(iPublic, publicPrototype);
-                        }
-                    } else if (this.tagName !== undefined) {
-                        iPublic = document.createElement(this.tagName);
+                if (RootType && isHTMLType(RootType.prototype)) {
+                    iPublic = document.createElement(this.tagName);
+                    if (iPublic.prototype !== publicPrototype) {
+                        // what, no custom elements ?
                         Object.setPrototypeOf(iPublic, publicPrototype);
-                    } else {
-                        var RootType = desc ? desc.baseType : undefined;
-                        while (RootType && typeof RootType.extend === "function" && RootType.extend[' oracle '] === EXTEND_ORACLE) {
-                            var proto = Object.getPrototypeOf(RootType.prototype);
-                            RootType = proto ? proto.constructor : undefined;
-                        }
-
-                        if (RootType && typeof RootType === 'function') {
-                            // lets use `new` which *should* be supported
-                            iPublic = new (Function.prototype.bind.apply(RootType, [RootType].concat(args)))();
-                            Object.setPrototypeOf(iPublic, publicPrototype);
-                        } else {
-                            // we have no root constructor, so just create from our prototype
-                            iPublic = Object.create(publicPrototype);
-                        }
                     }
+                } else {
+                    iPublic = Object.create(publicPrototype);
+                    if (typeof RootType === 'function') {
+                        // if you want to use `new`, use ecma5-extend.Type.upgrade(new Something())
+                        RootType.apply(iPublic, arguments);
+                    }
+                }
+                var args = Array.prototype.slice.call(arguments);
+                args.unshift(iPublic);
+                return self.initialize.apply(self, args);
+            }
+        },
+
+        upgrade : {
+            /**
+             * Upgrades an object of a type from which this type ultimately inherits, and initializes it.
+             * Example: CustomEvent or HTMLElement DOM types
+             *
+             * @method upgrade
+             * @memberof ecma5-extend.Type#
+             * @param  {object} Object An instance of a type from which this type ultimately inherits
+             * @param  {...*} [arguments] Initialization arguments to be passed to the type init() function
+             * @return {ecma5-extend.Object} An initialized ecma5-extend object
+             */
+            value : function(iPublic) {
+                Object.setPrototypeOf(iPublic, publicPrototype);
+                return self.initialize.apply(self, arguments);
+            }
+        },
+
+        initialize : {
+            /**
+             * Initializes an object of this type
+             * Example: Object.create(ecmae-extend.Type.prototype) or custom-elements
+             *
+             * @method initialize
+             * @memberof ecma5-extend.Type#
+             * @param  {object} Object An un-initialized object of this type
+             * @param  {...*} [arguments] Initialization arguments to be passed to the type init() function
+             * @return {ecma5-extend.Object} An initialized ecma5-extend object
+             */
+            value : function(iPublic) {
+                if (self.prototype.isPrototypeOf(this.public)) {
+                    /* chain to base clase: this === iProtected */
+                    if (desc.baseType && typeof desc.baseType.extend === "function" && desc.baseType.extend[' oracle '] === EXTEND_ORACLE) {
+                        desc.baseType.initialize.apply(this, arguments);
+                    }
+
+                    var iPrivate = Object.create(privatePrototype, {
+                        "protected" : {
+                            enumerable : true,
+                            writable : badDefineProperty,
+                            configurable : true,
+                            value : this
+                        },
+                        "public" : {
+                            enumerable : true,
+                            writable : badDefineProperty,
+                            configurable : true,
+                            value : this.public
+                        }
+                    });
+
+                    desc.privateRegistry[this.public.__id] = iPrivate;
+                } else {
+                    /* we are the final type */
+                    if (iPublic.__id) {
+                        console.warn('ecma5-extend: object is already initialized', iPublic);
+                        return iPublic;
+                    }
+
+                    var __id = objectCount++;
                     Object.defineProperty(iPublic, "__id", {
                         configurable : true,
                         writable : false,
@@ -853,35 +910,15 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
                         }
                     });
 
+                    var args = Array.prototype.slice.call(arguments, 1);
+
                     // call the branch below to chain up the extend type hierarchy to create private objects
-                    self.create.apply(iProtected, args);
+                    self.initialize.apply(iProtected, args);
 
                     // run the type initialization code (chains through the types)
                     iProtected.init.apply(iProtected, args);
 
                     return iPublic;
-                } else {
-                    /* chain to base clase: this === iProtected */
-                    if (desc.baseType && typeof desc.baseType.extend === "function" && desc.baseType.extend[' oracle '] === EXTEND_ORACLE) {
-                        desc.baseType.create.apply(this, args);
-                    }
-
-                    var iPrivate = Object.create(privatePrototype, {
-                        "protected" : {
-                            enumerable : true,
-                            writable : badDefineProperty,
-                            configurable : true,
-                            value : this
-                        },
-                        "public" : {
-                            enumerable : true,
-                            writable : badDefineProperty,
-                            configurable : true,
-                            value : this.public
-                        }
-                    });
-
-                    desc.privateRegistry[this.public.__id] = iPrivate;
                 }
             }
         },
@@ -1047,7 +1084,8 @@ var createType = function(definition) {
         self : self,
         name : definition.name,
         privateRegistry : privateRegistry,
-        baseType : baseType
+        baseType : baseType,
+        final : definition.final
     }, publicPrototype, protectedPrototype, privatePrototype));
 
     Object.defineProperties(publicPrototype, {

@@ -53,18 +53,31 @@ describe('htmlelement.js', function() {
             this.obj.destroy();
         });
 
-        it('ignore different html elements', function() {
-            var child = document.createElement('div');
-            this.obj = Type.create(child);
-            expect(this.obj.tagName.toUpperCase()).to.equal('X-ELEMENT');
-            expect(this.obj).not.to.equal(child);
+        it('upgrade an html element', function() {
+            this.obj = document.createElement(Type.tagName);
+            var obj = Type.upgrade(this.obj);
+            expect(obj.tagName.toUpperCase()).to.equal(Type.tagName.toUpperCase(), 'object has the correct tag name');
+            expect(obj).to.equal(this.obj, 'object is upgraded in-place');
         });
 
-        it('use matching html elements', function() {
-            var child = document.createElement('x-element');
-            this.obj = Type.create(child);
-            expect(this.obj.tagName.toUpperCase()).to.equal('X-ELEMENT');
-            expect(this.obj).to.equal(child);
+        it('initialize an html custom-element', function() {
+            this.obj = document.createElement(Type.tagName);
+            Object.setPrototypeOf(this.obj, Type.prototype);
+            var obj = Type.initialize(this.obj);
+            expect(obj.tagName.toUpperCase()).to.equal(Type.tagName.toUpperCase(), 'object has the correct tag name');
+            expect(obj).to.equal(this.obj, 'object is initialized in-place');
+        });
+
+        (typeof document.registerElement === 'function' ? it : it.skip)('initialize a real custom-element', function() {
+            Type.prototype.createdCallback = function() {
+                Type.initialize(this);
+            };
+            document.registerElement(Type.tagName, {
+                prototype : Type.prototype
+            });
+            var obj = document.createElement(Type.tagName);
+            expect(obj.tagName.toUpperCase()).to.equal(Type.tagName.toUpperCase(), 'object has the correct tag name');
+            expect(typeof obj.__id).to.equal('number', 'object is initialized in-place');
         });
     });
 
