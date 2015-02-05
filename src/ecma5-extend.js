@@ -779,10 +779,10 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
 };
 
 var isHTMLType = function(object) {
-    if ( typeof window === "undefined" || typeof window.Node === "undefined" || typeof object === "undefined") {
+    if (typeof window === "undefined" || typeof window.Node === "undefined" || typeof object === "undefined") {
         return false;
     }
-    return (object.prototype instanceof window.Node || object instanceof window.Node);
+    return (object instanceof window.Node);
 };
 
 var EXTEND_ORACLE = "75E3BA8C-63AF-45DE-85C3-260FF96453B9";
@@ -806,7 +806,7 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
 
                 if (this === self) {
                     var __id = objectCount++, iPublic;
-                    if (isHTMLType(args[0]) && isHTMLType(publicPrototype)) {
+                    if (isHTMLType(args[0]) && isHTMLType(self.prototype) && args[0].tagName === self.tagName) {
                         iPublic = args[0];
                         args = args.slice(1);
                         if (Object.getPrototypeOf(iPublic) !== publicPrototype) {
@@ -1013,8 +1013,8 @@ var createType = function(definition) {
         baseType = baseTypeDefinition;
         self = {};
     }
-    if (baseType && isHTMLType(baseType)) {
-        self.tagName = "EL-" + definition.name.toUpperCase();
+    if (baseType && isHTMLType(baseType.prototype)) {
+        self.tagName = (definition.tagName || "EL-" + definition.name).toUpperCase();
     }
     typeRegistry[definition.__id] = self;
 

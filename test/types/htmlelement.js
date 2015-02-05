@@ -14,7 +14,28 @@
  * limitations under the License.
  */
 
-require("./base.js");
-require("./derived.js");
-require("./array.js");
-require("./object.js");
+var _f = "f";
+
+module.exports = {
+
+    name : "xelement",
+
+    extend : window.HTMLElement,
+
+    tagName : "x-element",
+
+    private : {
+        x : undefined,
+        y : {},
+        z : undefined
+    },
+
+    public : {
+        a : undefined
+    },
+
+    protected : {
+        b : undefined,
+        c : {}
+    }
+};
