@@ -64,19 +64,13 @@ module.exports = function(grunt) {
         clean : ['artifact/*', '!artifact/.gitignore', 'test/browserified_*.js', 'tmp/'],
 
         browserify : {
-            options : {
-                alias : ['src/ecma5-extend.js:ecma5-extend'],
-                debug : true
-                /*watch : true,
-                 keepAlive : true*/
-            },
             tests : {
                 files : {
                     'test/browserified_mocha_unit_tests.js' : 'test/spec/**.js',
                 },
                 options : {
-                    external : ['src/lib/ecma5-extend:ecma5-extend'],
-                    bundleOptions : {
+                    alias : ['./src/ecma5-extend.js:ecma5-extend'],
+                    browserifyOptions : {
                         debug : true // Embed source map for tests
                     },
                 }
