@@ -57,7 +57,8 @@ module.exports = function(config) {
         captureTimeout : 15000,
         singleRun : true,
         junitReporter : {
-            outputFile : 'artifact/report-junit.xml'
+            outputDir: 'artifact',
+            outputFile : 'report-junit.xml'
         },
         preprocessors : {
             // Generates code coverage for the browserified tests.
