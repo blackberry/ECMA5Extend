@@ -755,11 +755,11 @@ var extendScope = function(definition, scope, baseType, privateDefn, privateRegi
 
     if (scope === "protected") {
         scopeDefn.init = {
-            value : defineInit(privateRegistry, definition.init, Object.getPrototypeOf(obj).init, definition.name, mixins, definition.mixinExtended)
+            value : defineInit(privateRegistry, definition.init, (Object.getPrototypeOf(obj) || Object).init, definition.name, mixins, definition.mixinExtended)
         };
     } else if (scope === "public") {
         scopeDefn.destroy = {
-            value : defineDestroy(privateRegistry, definition.destroy, Object.getPrototypeOf(obj).destroy, obj, definition.mixinExtended)
+            value : defineDestroy(privateRegistry, definition.destroy, (Object.getPrototypeOf(obj) || Object).destroy, obj, definition.mixinExtended)
         };
         if (definition.mixin) {
             mixins = Array.isArray(definition.mixin) ? definition.mixin : [definition.mixin];
