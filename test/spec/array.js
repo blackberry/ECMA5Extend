@@ -32,6 +32,11 @@ describe('array.js', function() {
         this.obj = Type.create();
     });
 
+    it('create an instance with 1 inherited constructor agument', function() {
+        this.obj = Type.create(10);
+        expect(this.obj.length).to.equal(10);
+    });
+
     it('publish/subscribe', function() {
         expect(this.obj.publish).to.be.a("function");
         expect(this.obj.subscribe).to.be.a("function");

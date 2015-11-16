@@ -18,19 +18,7 @@
 var seed = Math.round(Math.random() * 100) * 10;
 var OPEN_PORT = 9043 + seed;
 var LIVERELOAD_PORT = 35729 + seed;
-var connectLivereload = require('connect-livereload');
 
-var connectOptions = function(index) {
-    index = index || 0;
-    return {
-        port : OPEN_PORT + index,
-        middleware : function(connect) {
-            return [connectLivereload({
-                port : LIVERELOAD_PORT + index * 1000
-            }), connect.static(require('path').resolve('./'))];
-        }
-    }
-};
 var watchOptions = function(index) {
     return {
         livereload : {
@@ -47,8 +35,7 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {
         jscs : 'grunt-jscs-checker',
         mochacov : 'grunt-mocha-cov',
-        mochaAppium : 'grunt-mocha-appium',
-        'validate-package' : 'grunt-nsp-package'
+        mochaAppium : 'grunt-mocha-appium'
     });
 
     // configurable paths
@@ -111,6 +98,10 @@ module.exports = function(grunt) {
             }
         },
 
+        nsp: {
+            'package': grunt.file.readJSON('package.json')
+        },
+
         open : {
             unit : {
                 path : 'http://0.0.0.0:<%= connect.tdd.options.port %>/test/unit-tests.html'
@@ -126,10 +117,14 @@ module.exports = function(grunt) {
                 hostname : '0.0.0.0'
             },
             tdd : {
-                options : connectOptions(0)
+                options : {
+                    livereload: LIVERELOAD_PORT + 1000
+                }
             },
             jsdoc : {
-                options : connectOptions(1)
+                options : {
+                    livereload: LIVERELOAD_PORT + 2000
+                }
             }
         },
 
@@ -152,7 +147,7 @@ module.exports = function(grunt) {
                 options : {
                     breakOnErrors : false,
                     errorsOnly : false,
-                    cyclomatic : [16, 20, 25], // or optionally a single value, like 3
+                    cyclomatic : [17, 20, 25], // or optionally a single value, like 3
                     halstead : [35, 40, 45], // or optionally a single value, like 8
                     maintainability : 100,
                     hideComplexFunctions : false,
@@ -268,7 +263,7 @@ module.exports = function(grunt) {
 
     // Whenever the "test" task is run, first clean the "tmp" dir, then run this
     // plugin's task(s), then test the result.
-    grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity', 'validate-package']);
+    grunt.registerTask('validate', ['jscs', 'jshint:dev', 'complexity', 'nsp']);
     grunt.registerTask('validate:ci', ['jscs', 'jshint:ci', 'complexity']);
     grunt.registerTask('docs', ['jsdoc']);
     grunt.registerTask('watch:docs', ['jsdoc', 'connect:jsdoc', 'open:jsdoc', 'watch:jsdoc'])

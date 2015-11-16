@@ -1,7 +1,7 @@
 {
     "name": "ecma5-extend",
     "description": "Create OOP-style classes with javascript",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "homepage": "http://gerrit.rim.net/gitweb?p=meapclient/ecma5-extend.git",
     "author": {
         "name": "Isaac Gordezky",
@@ -25,7 +25,6 @@
     "devDependencies": {
         "chai": "latest",
         "colors": "latest",
-        "connect-livereload": "latest",
         "grunt": "^0.4.5",
         "grunt-browserify": "^3.3.0",
         "grunt-complexity": "latest",
@@ -41,7 +40,7 @@
         "grunt-jsdoc": "^0.6.1",
         "grunt-karma": "latest",
         "grunt-mocha-appium": "latest",
-        "grunt-nsp-package": "latest",
+        "grunt-nsp": "latest",
         "grunt-open": "latest",
         "ink-docstrap": "latest",
         "jit-grunt": "latest",

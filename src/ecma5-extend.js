@@ -779,6 +779,40 @@ var isHTMLType = function(object) {
     return (object instanceof window.Node);
 };
 
+// Used to resolve the internal `[[Class]]` of values
+var toString = Object.prototype.toString;
+
+// Used to resolve the decompiled source of functions
+var fnToString = Function.prototype.toString;
+
+// Used to detect host constructors (Safari > 4; really typed array specific)
+var reHostCtor = /^\[object .+?Constructor\]$/;
+
+// Compile a regexp using a common native method as a template.
+// We chose `Object#toString` because there's a good chance it is not being mucked with.
+var reNative = RegExp('^' +
+    // Coerce `Object#toString` to a string
+    String(toString)
+    // Escape any special regexp characters
+    .replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
+    // Replace mentions of `toString` with `.*?` to keep the template generic.
+    // Replace thing like `for ...` to support environments like Rhino which add extra info
+    // such as method arity.
+    .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+var isNative = function(value) {
+    var type = typeof value;
+    return type === 'function' ?
+        // Use `Function#toString` to bypass the value's own `toString` method
+        // and avoid being faked out.
+        reNative.test(fnToString.call(value)) :
+        // Fallback to a host object check because some environments will represent
+        // things like typed arrays as DOM methods which may not conform to the
+        // normal native pattern.
+        (value && type === 'object' && reHostCtor.test(toString.call(value))) || false;
+};
+
 var EXTEND_ORACLE = "75E3BA8C-63AF-45DE-85C3-260FF96453B9";
 var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, protectedPrototype, privatePrototype) {
     var self = desc.self;
@@ -804,6 +838,7 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
              */
             value : function() {
                 var iPublic;
+                var args = Array.prototype.slice.call(arguments);
                 var RootType = desc ? desc.baseType : undefined;
                 while (RootType && typeof RootType.extend === "function" && RootType.extend[' oracle '] === EXTEND_ORACLE) {
                     var proto = Object.getPrototypeOf(RootType.prototype);
@@ -819,11 +854,16 @@ var defineTypeProperties = function defineTypeProperties(desc, publicPrototype, 
                 } else {
                     iPublic = Object.create(publicPrototype);
                     if (typeof RootType === 'function') {
-                        // if you want to use `new`, use ecma5-extend.Type.upgrade(new Something())
-                        RootType.apply(iPublic, arguments);
+                        if (isNative(RootType)) {
+                            // this type requires `new` to construct
+                            iPublic = new (Function.prototype.bind.apply(RootType, [RootType].concat(args)))();
+                            Object.setPrototypeOf(iPublic, publicPrototype);
+                        } else {
+                            // if you want to use `new`, use ecma5-extend.Type.upgrade(new Something())
+                            RootType.apply(iPublic, arguments);
+                        }
                     }
                 }
-                var args = Array.prototype.slice.call(arguments);
                 args.unshift(iPublic);
                 return self.initialize.apply(self, args);
             }
