@@ -1,18 +1,19 @@
 {
     "name": "ecma5-extend",
-    "description": "Create OOP-style classes with javascript",
-    "version": "0.4.3",
-    "homepage": "http://gerrit.rim.net/gitweb?p=meapclient/ecma5-extend.git",
+    "description": "JavaScript library using features of the ECMA5 language spec to provide inheritance, public/private/protected APIs, and an intelligent Event System",
+    "version": "0.5.0",
+    "homepage": "https://github.com/blackberry/ECMA5Extend",
     "author": {
         "name": "Isaac Gordezky",
         "email": "igordezky@blackberry.com"
     },
+    "contributors": [{
+        "name": "Anzor Bashkhaz",
+        "email": "anzorb@gmail.com"
+    }],
     "repository": {
         "type": "git",
-        "url": "ssh://gerrit.rim.net:29418/meapclient/ecma5-extend.git"
-    },
-    "bugs": {
-        "url": "https://jira.bbqnx.net/browse/MEAPCLIENT/component/20018"
+        "url": "git+ssh://git@github.com:blackberry/ECMA5Extend.git"
     },
     "engines": {
         "node": ">= 0.8.0"
@@ -67,9 +68,6 @@
         "gruntplugin",
         "ecma5-extend"
     ],
-    "publishConfig": {
-        "registry": "http://npm-proxy.rim.net:5984/"
-    },
     "files": [
         "LICENSE",
         "README.md",
