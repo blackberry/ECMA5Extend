@@ -1,12 +1,16 @@
 {
     "name": "ecma5-extend",
-    "description": "Create OOP-style classes with javascript",
-    "version": "0.4.3",
+    "description": "JavaScript library using features of the ECMA5 language spec to provide inheritance, public/private/protected APIs, and an intelligent Event System",
+    "version": "0.5.0",
     "homepage": "http://gerrit.rim.net/gitweb?p=meapclient/ecma5-extend.git",
     "author": {
         "name": "Isaac Gordezky",
         "email": "igordezky@blackberry.com"
     },
+    "contributors": [{
+        "name": "Anzor Bashkhaz",
+        "email": "anzorb@gmail.com"
+    }],
     "repository": {
         "type": "git",
         "url": "ssh://gerrit.rim.net:29418/meapclient/ecma5-extend.git"
